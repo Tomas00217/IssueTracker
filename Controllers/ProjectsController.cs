@@ -59,6 +59,7 @@ namespace IssueTracker.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(project);
+                project.CreatedOn = DateTime.Now;
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -84,36 +85,36 @@ namespace IssueTracker.Controllers
         // POST: Projects/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartDate,TargetEndDate,ActualEndDate,ModifiedOn,ModifiedBy")] Project project)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != project.Id)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            projectToUpdate.ModifiedOn = DateTime.Now;
+            if (await TryUpdateModelAsync<Project>(
+                projectToUpdate,
+                "",
+                p => p.Name, p => p.StartDate, p => p.TargetEndDate, p => p.ActualEndDate, p => p.ModifiedBy))
             {
+
                 try
                 {
-                    _context.Update(project);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!ProjectExists(project.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(project);
+            return View(projectToUpdate);
         }
 
         // GET: Projects/Delete/5
