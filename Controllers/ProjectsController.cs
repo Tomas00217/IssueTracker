@@ -18,7 +18,7 @@ namespace IssueTracker.Controllers
         {
             _context = context;
         }
-
+        
         // GET: Projects
         public async Task<IActionResult> Index()
         {
@@ -106,9 +106,8 @@ namespace IssueTracker.Controllers
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateException /* ex */)
+                catch (DbUpdateException )
                 {
-                    //Log the error (uncomment ex variable name and write a log.)
                     ModelState.AddModelError("", "Unable to save changes. " +
                         "Try again, and if the problem persists, " +
                         "see your system administrator.");
