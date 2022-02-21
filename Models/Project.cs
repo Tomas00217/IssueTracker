@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IssueTracker.Models
 {
@@ -25,11 +26,11 @@ namespace IssueTracker.Models
         [DataType(DataType.DateTime)]
         public DateTime CreatedOn { get; set; }
 
-        public int CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime ModifiedOn { get; set; }
 
-        public int ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
     }
 }
