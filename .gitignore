@@ -52,7 +52,9 @@ TestResults/
 ######################
 *.log
 *.sqlite
-app.db
+*.db*
+app.db-shm
+app.db-wal
 # OS generated files #
 ######################
 .DS_Store?
