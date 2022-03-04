@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IssueTracker.Models
 {
@@ -10,13 +10,14 @@ namespace IssueTracker.Models
 
         [Required]
         [StringLength(200)]
+        [Column(TypeName = "VARCHAR (200)")]
         public string? Summary { get; set; }
 
         [StringLength(2000)]
+        [Column(TypeName = "VARCHAR (2000)")]
         public string? Description { get; set; }
 
-        [StringLength(50)]
-        public string? State { get; set; }
+        public int State { get; set; }
 
         [Required]
         public int Priority { get; set; }
@@ -27,18 +28,20 @@ namespace IssueTracker.Models
         [DataType(DataType.Date)]
         public DateTime ActualResolutionDate { get; set; }
 
-        public int AssignedTo { get; set; }
-
-        public int ProjectId { get; set; }
-
         [DataType(DataType.DateTime)]
         public DateTime CreatedOn { get; set; }
 
-        public string? CreatedBy { get; set; }
+        [ForeignKey("Project")]
+        public int ProjectId { get; set; }
+        public Project? Project { get; set; }
 
-        [DataType(DataType.DateTime)]
-        public DateTime ModifiedOn { get; set; }
+        [ForeignKey("Person")]
+        public int AsigneeId { get; set; }
+        public Person? Asignee { get; set; }
 
-        public string? ModifiedBy { get; set; }
+        [ForeignKey("Person")]
+        public int CreatorId { get; set; }
+        public Person? Creator { get; set; }
+
     }
 }

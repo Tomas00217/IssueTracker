@@ -34,7 +34,7 @@ namespace IssueTracker.Controllers
             }
 
             var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ProjectId == id);
             if (project == null)
             {
                 return NotFound();
@@ -54,16 +54,14 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,StartDate,TargetEndDate,ActualEndDate,CreatedOn,CreatedBy,ModifiedOn,ModifiedBy")] Project project)
+        public async Task<IActionResult> Create(Project project)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(project);
-                project.CreatedOn = DateTime.Now;
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(project);
+      
+            project.CreatedOn = DateTime.Now;
+            _context.Projects.Add(project);
+            
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
 
         // GET: Projects/Edit/5
@@ -93,9 +91,9 @@ namespace IssueTracker.Controllers
             {
                 return NotFound();
             }
-            var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
-            projectToUpdate.ModifiedOn = DateTime.Now;
-            if (await TryUpdateModelAsync<Project>(
+            var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
+            
+/*            if (await TryUpdateModelAsync<Project>(
                 projectToUpdate,
                 "",
                 p => p.Name, p => p.StartDate, p => p.TargetEndDate, p => p.ActualEndDate, p => p.ModifiedBy))
@@ -112,7 +110,7 @@ namespace IssueTracker.Controllers
                         "Try again, and if the problem persists, " +
                         "see your system administrator.");
                 }
-            }
+            }*/
             return View(projectToUpdate);
         }
 
@@ -125,7 +123,7 @@ namespace IssueTracker.Controllers
             }
 
             var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ProjectId == id);
             if (project == null)
             {
                 return NotFound();
@@ -147,7 +145,7 @@ namespace IssueTracker.Controllers
 
         private bool ProjectExists(int id)
         {
-            return _context.Projects.Any(e => e.Id == id);
+            return _context.Projects.Any(e => e.ProjectId == id);
         }
     }
 }

@@ -5,12 +5,18 @@ namespace IssueTracker.Models
 {
     public class Person_Project
     {
-        [ForeignKey("PersonForeignKey")]
+
+        [ForeignKey("Person")]
+        public int PersonId { get; set; }
         public Person? Person { get; set; }
-        [ForeignKey("ProjectForeignKey")]
+
+        [ForeignKey("Project")]
+        public int ProjectId { get; set; }
+
         public Project? Project { get; set; }
+
         [StringLength(100)]
-        public string? Role { get; set; }
+        public int Role { get; set; }
 
     }
 }

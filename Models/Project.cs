@@ -6,10 +6,11 @@ namespace IssueTracker.Models
     public class Project
     {
         [Key]
-        public int Id { get; set; }
+        public int ProjectId { get; set; }
 
         [Required]
-        [StringLength(255)]
+        [StringLength(100)]
+        [Column(TypeName = "VARCHAR (100)")]
         public string? Name { get; set; }
 
         [Required]
@@ -26,11 +27,5 @@ namespace IssueTracker.Models
         [DataType(DataType.DateTime)]
         public DateTime CreatedOn { get; set; }
 
-        public string? CreatedBy { get; set; }
-
-        [DataType(DataType.DateTime)]
-        public DateTime ModifiedOn { get; set; }
-
-        public string? ModifiedBy { get; set; }
     }
 }
