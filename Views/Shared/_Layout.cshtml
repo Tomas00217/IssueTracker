@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
+
+<!DOCTYPE html>
 <html lang="en" style="max-height:100vh">
 <head>
     <meta charset="utf-8" />
@@ -20,15 +23,18 @@
                 <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Projects" asp-action="Index">Projects</a>
             </div>
         </div>
-        <!-- TODO: change home for login and projects for register -->
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-light">
                 <div class="container-fluid">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                            <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Projects" asp-action="Index">Projects</a></li>
+                            @if (@httpContextAccessor?.HttpContext?.Session.GetString("UserEmail") != null) {
+                                <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Logout">Logout</a></li>
+                            } else
+                            {
+                                <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Index">Login</a></li>
+                            }
                         </ul>
                     </div>
                 </div>
