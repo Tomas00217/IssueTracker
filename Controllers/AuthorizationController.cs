@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using IssueTracker.Models;
 using System.Security.Cryptography;
 using System.Text;
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace IssueTracker.Controllers
 {
@@ -16,11 +17,15 @@ namespace IssueTracker.Controllers
     {
 
         private readonly IssueTrackerContext _context;
+        private readonly INotyfService _notyf;
 
-        public AuthorizationController(IssueTrackerContext context)
+        public AuthorizationController(IssueTrackerContext context, INotyfService notyf)
         {
             _context = context;
+            _notyf = notyf;
         }
+
+        
 
         public string ToSHA512(string input)
         {
@@ -45,20 +50,23 @@ namespace IssueTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(Person person, string passwd)
         {
-            /*if (!person.Password.Equals(passwd))
-            {
-                return View("Index", person);
-            }*/
             if (_context.Persons.Any(p => p.Email.Equals(person.Email)))
-            {               
-                return View("Index", person);
+            {
+                _notyf.Error("Email is already in use.");
+                return View("Index");
+            }
+
+            if (!person.Password.Equals(passwd))
+            {
+                _notyf.Error("Passwords didn't match.");
+                return View("Index");
             }
 
             person.Password = ToSHA512(person.Password);
-            _context.Persons.Add(person);
-            
+            _context.Persons.Add(person); 
             await _context.SaveChangesAsync();
 
+            _notyf.Success("Registration sucessfull.");
             return View("Index");
         }
 
@@ -66,21 +74,31 @@ namespace IssueTracker.Controllers
         {
             Person user = await _context.Persons
                 .FirstOrDefaultAsync(u => u.Email.Equals(person.Email));
+
             if (user == null)
             {
-                return NotFound();
+                _notyf.Error("Unknown email.");
+                return View("Index");
             }
 
             if (ToSHA512(person.Password).Equals(user.Password))
             {
-                HttpContext.Session.SetString("UserEmail", user.Email);
+                _notyf.Success("Logged in sucessfully.");
+                HttpContext.Session.SetString("UserId", user.PersonId.ToString());
+            } else
+            {
+                _notyf.Error("Wrong password.");
+                return View("Index");
             }
+
+            
             return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()
         {
             HttpContext.Session?.Clear();
+            _notyf.Success("Logged out sucessfully.");
             return View("Index");
         }
 
