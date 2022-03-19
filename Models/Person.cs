@@ -23,7 +23,7 @@ namespace IssueTracker.Models
 
         [Required]
         [Column(TypeName = "VARCHAR (64)")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
     }
 }

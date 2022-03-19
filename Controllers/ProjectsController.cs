@@ -30,14 +30,14 @@ namespace IssueTracker.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Authorization");
             }
 
             var project = await _context.Projects
                 .FirstOrDefaultAsync(m => m.ProjectId == id);
             if (project == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Authorization");
             }
 
             return View(project);

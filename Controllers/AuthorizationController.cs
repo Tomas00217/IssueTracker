@@ -25,8 +25,6 @@ namespace IssueTracker.Controllers
             _notyf = notyf;
         }
 
-        
-
         public string ToSHA512(string input)
         {
             using (SHA512 sha512Hash = SHA512.Create())
@@ -38,12 +36,16 @@ namespace IssueTracker.Controllers
 
                 return hash;
             }
-
         }
 
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult Register()
+        {
+            return View("Register");
         }
 
         [HttpPost]
@@ -53,20 +55,20 @@ namespace IssueTracker.Controllers
             if (_context.Persons.Any(p => p.Email.Equals(person.Email)))
             {
                 _notyf.Error("Email is already in use.");
-                return View("Index");
+                return View("Register");
             }
 
             if (!person.Password.Equals(passwd))
             {
-                _notyf.Error("Passwords didn't match.");
-                return View("Index");
+                _notyf.Error("Passwords did not match.");
+                return View("Register");
             }
 
             person.Password = ToSHA512(person.Password);
             _context.Persons.Add(person); 
             await _context.SaveChangesAsync();
 
-            _notyf.Success("Registration sucessfull.");
+            _notyf.Success("Registration sucessful.");
             return View("Index");
         }
 
@@ -84,6 +86,7 @@ namespace IssueTracker.Controllers
             if (ToSHA512(person.Password).Equals(user.Password))
             {
                 _notyf.Success("Logged in sucessfully.");
+                //ViewBag.person = person;
                 HttpContext.Session.SetString("UserId", user.PersonId.ToString());
             } else
             {

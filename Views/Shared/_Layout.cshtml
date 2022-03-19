@@ -19,8 +19,10 @@
                 <a asp-area="" asp-controller="Home" asp-action="Index"><img class="p-2" style="width:100px" alt=logo src=~/img/logo.png></a>
             </div>
             <div class="list-group list-group-flush">
-                <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a>
+                <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Persons" asp-action="Profile">Profile</a>
                 <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Projects" asp-action="Index">Projects</a>
+                <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Projects" asp-action="Index">MyIssues</a>
             </div>
         </div>
         <div class="container">
@@ -29,11 +31,12 @@
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                            @if (@httpContextAccessor?.HttpContext?.Session.GetString("UserEmail") != null) {
+                            @if (@httpContextAccessor?.HttpContext?.Session.GetString("UserId") != null) {
                                 <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Logout">Logout</a></li>
                             } else
                             {
                                 <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Index">Login</a></li>
+                                <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Register">Register</a></li>
                             }
                         </ul>
                     </div>
