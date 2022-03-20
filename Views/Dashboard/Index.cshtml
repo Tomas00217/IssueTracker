@@ -1,0 +1,10 @@
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Dashboard</h1>
+    <p>@httpContextAccessor?.HttpContext?.Session.GetString("UserId")</p>
+</div>

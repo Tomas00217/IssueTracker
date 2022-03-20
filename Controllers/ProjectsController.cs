@@ -19,10 +19,27 @@ namespace IssueTracker.Controllers
             _context = context;
         }
 
+        private Boolean IsNotLogged()
+        {
+            String idStr = HttpContext.Session.GetString("UserId");
+
+            return idStr == null || idStr.Length <= 0;
+        }
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Projects.ToListAsync());
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+
+            List<PersonProject> personProject = await _context.PersonProjects.Where(p => p.PersonId == Int32.Parse(HttpContext.Session.GetString("UserId"))).ToListAsync();
+            List<Project> projects = new List<Project>();
+
+            personProject.ForEach(p => projects.Add(_context.Projects.FirstOrDefault(x => x.ProjectId == p.ProjectId)));
+
+
+            return View(projects);
         }
 
         // GET: Projects/Details/5
@@ -37,7 +54,7 @@ namespace IssueTracker.Controllers
                 .FirstOrDefaultAsync(m => m.ProjectId == id);
             if (project == null)
             {
-                return RedirectToAction("Index", "Authorization");
+                return View("Index");
             }
 
             return View(project);
@@ -46,6 +63,10 @@ namespace IssueTracker.Controllers
         // GET: Projects/Create
         public IActionResult Create()
         {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
             return View();
         }
 
@@ -56,10 +77,28 @@ namespace IssueTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Project project)
         {
-      
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+
+
             project.CreatedOn = DateTime.Now;
+       
             _context.Projects.Add(project);
-            
+
+            PersonProject personProject = new()
+            {
+                PersonId = Int32.Parse(HttpContext.Session.GetString("UserId")),
+                ProjectId = project.ProjectId,
+                Role = 1
+            };
+            personProject.Project = project;
+            personProject.Person = _context.Persons.FirstOrDefault(x => x.PersonId == personProject.PersonId);
+
+            _context.PersonProjects.Add(personProject);
+
+
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
@@ -69,7 +108,7 @@ namespace IssueTracker.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Authorization");
             }
 
             var project = await _context.Projects.FindAsync(id);
@@ -89,7 +128,7 @@ namespace IssueTracker.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Authorization");
             }
             var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
             
@@ -119,7 +158,7 @@ namespace IssueTracker.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Authorization");
             }
 
             var project = await _context.Projects

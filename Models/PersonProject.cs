@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IssueTracker.Models
 {
-    public class Person_Project
+    public class PersonProject
     {
 
         [ForeignKey("Person")]

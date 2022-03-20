@@ -95,7 +95,7 @@ namespace IssueTracker.Controllers
             }
 
             
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Dashboard");
         }
 
         public IActionResult Logout()
