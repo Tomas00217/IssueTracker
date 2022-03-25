@@ -17,10 +17,10 @@ namespace IssueTracker.Models
         [Column(TypeName = "VARCHAR (2000)")]
         public string? Description { get; set; }
 
-        public int State { get; set; }
+        public IssueStatus State { get; set; }
 
         [Required]
-        public int Priority { get; set; }
+        public IssuePriority Priority { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime TargetResolutionDate { get; set; }
@@ -35,7 +35,6 @@ namespace IssueTracker.Models
         public int ProjectId { get; set; }
         public Project? Project { get; set; }
 
-        [ForeignKey("Person")]
         public int AsigneeId { get; set; }
         public Person? Asignee { get; set; }
 
@@ -43,5 +42,20 @@ namespace IssueTracker.Models
         public int CreatorId { get; set; }
         public Person? Creator { get; set; }
 
+    }
+
+    public enum IssuePriority
+    {
+        Low,
+        Medium,
+        High
+    }
+
+    public enum IssueStatus
+    {
+        New,
+        Active,
+        Resolved,
+        Closed
     }
 }

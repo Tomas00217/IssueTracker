@@ -4,6 +4,20 @@
     ViewData["Title"] = "Details";
 }
 
+@functions {
+    public int getPeopleCount(int projectId)
+    {
+        IQueryable<int> projectIds = ViewBag.ProjectIds;
+        return projectIds.Where(id => id == projectId).Count();
+    }
+
+    public int getIssueCount(int projectId)
+    {
+        List<Issue> issues = ViewBag.Issues;
+        return issues.Where(issue => issue.ProjectId == projectId).Count();
+    }
+}
+
 <h1>Details</h1>
 
 <div>
@@ -15,6 +29,18 @@
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            People working on this project:
+        </dt>
+        <dd class = "col-sm-10">
+            @getPeopleCount(@Model.ProjectId)
+        </dd>
+        <dt class = "col-sm-2">
+            Number of issues:
+        </dt>
+        <dd class = "col-sm-10">
+            @getIssueCount(@Model.ProjectId)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.StartDate)
@@ -41,6 +67,10 @@
             @Html.DisplayFor(model => model.CreatedOn)
         </dd>
     </dl>
+</div>
+<div>
+    <a asp-action="AddPerson">Invite to project</a>
+    <a asp-controller="Issues" asp-action="Create">Create issue</a>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.ProjectId">Edit</a> |

@@ -13,7 +13,6 @@ namespace IssueTracker.Models
             => options.UseSqlite(@"Data Source=D:\Projekty\IssueTracker\app.db");
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
             modelBuilder.Entity<PersonProject>()
                 .HasKey(c => new { c.PersonId, c.ProjectId });
         }

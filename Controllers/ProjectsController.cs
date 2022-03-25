@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IssueTracker.Models;
+using IssueTracker.Utils;
 
 namespace IssueTracker.Controllers
 {
@@ -25,26 +26,35 @@ namespace IssueTracker.Controllers
 
             return idStr == null || idStr.Length <= 0;
         }
+
         // GET: Projects
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             if (IsNotLogged())
             {
                 return RedirectToAction("Index", "Authorization");
             }
 
-            List<PersonProject> personProject = await _context.PersonProjects.Where(p => p.PersonId == Int32.Parse(HttpContext.Session.GetString("UserId"))).ToListAsync();
-            List<Project> projects = new List<Project>();
+            var userId = int.Parse(HttpContext.Session.GetString("UserId") ?? "-1");
+            var projects = _context.GetUserProjects(userId);
 
-            personProject.ForEach(p => projects.Add(_context.Projects.FirstOrDefault(x => x.ProjectId == p.ProjectId)));
+            var projectIds = _context.Projects.Select(proj => proj.ProjectId);
+            ViewData["ProjectIds"] = projectIds;
 
+            var issues = _context.Issues.ToList();
+            ViewData["Issues"] = issues;
 
             return View(projects);
         }
 
-        // GET: Projects/Details/5
+        // GET: Projects/Details
         public async Task<IActionResult> Details(int? id)
         {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+
             if (id == null)
             {
                 return RedirectToAction("Index", "Authorization");
@@ -56,6 +66,12 @@ namespace IssueTracker.Controllers
             {
                 return View("Index");
             }
+
+            var projectIds = _context.Projects.Select(proj => proj.ProjectId);
+            ViewData["ProjectIds"] = projectIds;
+
+            var issues = _context.Issues.ToList();
+            ViewData["Issues"] = issues;
 
             return View(project);
         }
@@ -71,17 +87,14 @@ namespace IssueTracker.Controllers
         }
 
         // POST: Projects/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Project project)
+        public IActionResult Create(Project project)
         {
             if (IsNotLogged())
             {
                 return RedirectToAction("Index", "Authorization");
             }
-
 
             project.CreatedOn = DateTime.Now;
        
@@ -89,21 +102,20 @@ namespace IssueTracker.Controllers
 
             PersonProject personProject = new()
             {
-                PersonId = Int32.Parse(HttpContext.Session.GetString("UserId")),
+                PersonId = int.Parse(HttpContext.Session.GetString("UserId")),
                 ProjectId = project.ProjectId,
-                Role = 1
+                Role = ProjectRole.Manager
             };
             personProject.Project = project;
             personProject.Person = _context.Persons.FirstOrDefault(x => x.PersonId == personProject.PersonId);
 
             _context.PersonProjects.Add(personProject);
-
-
             _context.SaveChanges();
+
             return RedirectToAction("Index");
         }
 
-        // GET: Projects/Edit/5
+        // GET: Projects/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -120,8 +132,6 @@ namespace IssueTracker.Controllers
         }
 
         // POST: Projects/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPost(int? id)
@@ -171,7 +181,7 @@ namespace IssueTracker.Controllers
             return View(project);
         }
 
-        // POST: Projects/Delete/5
+        // POST: Projects/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

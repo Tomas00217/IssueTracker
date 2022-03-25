@@ -28,4 +28,5 @@ namespace IssueTracker.Models
         public DateTime CreatedOn { get; set; }
 
     }
+
 }

@@ -1,7 +1,22 @@
 ﻿@model IEnumerable<IssueTracker.Models.Project>
 
+
 @{
     ViewData["Title"] = "Projects";
+}
+
+@functions {
+    public int getPeopleCount(int projectId)
+    {
+        IQueryable<int> projectIds = ViewBag.ProjectIds;
+        return projectIds.Where(id => id == projectId).Count();
+    }
+
+    public int getIssueCount(int projectId)
+    {
+        List<Issue> issues = ViewBag.Issues;
+        return issues.Where(issue => issue.ProjectId == projectId).Count();
+    }
 }
 
 <h4>@ViewData["Title"]</h4>
@@ -14,6 +29,12 @@
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                People
+            </th>
+            <th>
+                Issues
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.StartDate)
@@ -35,6 +56,12 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @getPeopleCount(item.ProjectId)
+            </td>
+            <td>
+                @getIssueCount(item.ProjectId)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StartDate)

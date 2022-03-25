@@ -16,7 +16,14 @@ namespace IssueTracker.Models
         public Project? Project { get; set; }
 
         [StringLength(100)]
-        public int Role { get; set; }
+        public ProjectRole Role { get; set; }
 
+    }
+
+    public enum ProjectRole
+    {
+        Manager,
+        ProjectLead,
+        Developer
     }
 }

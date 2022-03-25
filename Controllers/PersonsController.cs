@@ -26,7 +26,7 @@ namespace IssueTracker.Controllers
 
         public IActionResult Profile()
         {
-            String? idStr = HttpContext.Session.GetString("UserId");
+            String idStr = HttpContext.Session.GetString("UserId");
 
             if (idStr == null)
             {
