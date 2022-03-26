@@ -1,5 +1,6 @@
-﻿@model IEnumerable<IssueTracker.Models.Project>
-
+﻿@model IEnumerable<IssueTracker.Models.Project>;
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
 
 @{
     ViewData["Title"] = "Projects";
@@ -17,13 +18,15 @@
         List<Issue> issues = ViewBag.Issues;
         return issues.Where(issue => issue.ProjectId == projectId).Count();
     }
+
+    public int getUserId()
+    {
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
+    }
 }
 
 <h4>@ViewData["Title"]</h4>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -76,11 +79,14 @@
                 @Html.DisplayFor(modelItem => item.CreatedOn)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ProjectId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProjectId">Details</a> |
+                <a asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.ProjectId">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<a class="btn btn-primary" asp-action="Create">
+    Create new project
+</a>

@@ -26,14 +26,12 @@ namespace IssueTracker.Controllers
 
         public IActionResult Profile()
         {
-            String idStr = HttpContext.Session.GetString("UserId");
+            int? id = HttpContext.Session.GetInt32("UserId");
 
-            if (idStr == null)
+            if (id == null)
             {
                 return RedirectToAction("Index", "Authorization");
             }
-
-            int? id = Int32.Parse(idStr);
 
             var person = _context.Persons
                 .FirstOrDefault(m => m.PersonId == id);

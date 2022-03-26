@@ -86,8 +86,7 @@ namespace IssueTracker.Controllers
             if (ToSHA512(person.Password).Equals(user.Password))
             {
                 _notyf.Success("Logged in sucessfully.");
-                //ViewBag.person = person;
-                HttpContext.Session.SetString("UserId", user.PersonId.ToString());
+                HttpContext.Session.SetInt32("UserId", user.PersonId);
             } else
             {
                 _notyf.Error("Wrong password.");

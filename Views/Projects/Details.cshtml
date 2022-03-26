@@ -24,52 +24,72 @@
     <h4>Project</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class = "col-sm-3">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class = "col-sm-3">
             People working on this project:
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @getPeopleCount(@Model.ProjectId)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class = "col-sm-3">
+            Project Lead:
+        </dt>
+        <dd class = "col-sm-9">
+            @if (@ViewBag.ProjectLead == null)
+            {
+                <p> Project does not have a project lead </p>
+                if (@ViewBag.UserRole == ProjectRole.Manager)
+                {
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#projectLead">
+                        Set Project Lead
+                    </button>
+                    <partial name="_SetProjectLeadModal"/>
+                }
+            } else
+            {
+                @ViewBag.ProjectLead
+            }
+        </dd>
+        <dt class = "col-sm-3">
             Number of issues:
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @getIssueCount(@Model.ProjectId)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class = "col-sm-3">
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @Html.DisplayFor(model => model.StartDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class = "col-sm-3">
             @Html.DisplayNameFor(model => model.TargetEndDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @Html.DisplayFor(model => model.TargetEndDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class = "col-sm-3">
             @Html.DisplayNameFor(model => model.ActualEndDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @Html.DisplayFor(model => model.ActualEndDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class = "col-sm-3">
             @Html.DisplayNameFor(model => model.CreatedOn)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @Html.DisplayFor(model => model.CreatedOn)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="AddPerson">Invite to project</a>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
+    <partial name="_AddToProjectModal"/>
     <a asp-controller="Issues" asp-action="Create">Create issue</a>
 </div>
 <div>

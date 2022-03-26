@@ -31,7 +31,7 @@
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                            @if (@httpContextAccessor?.HttpContext?.Session.GetString("UserId") != null) {
+                            @if (@httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") != null) {
                                 <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Logout">Logout</a></li>
                             } else
                             {
@@ -58,7 +58,9 @@
         
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("Notyf")

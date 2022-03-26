@@ -22,9 +22,9 @@ namespace IssueTracker.Controllers
 
         private Boolean IsNotLogged()
         {
-            String idStr = HttpContext.Session.GetString("UserId");
+            int? id = HttpContext.Session.GetInt32("UserId");
 
-            return idStr == null || idStr.Length <= 0;
+            return id == null || id < 0;
         }
 
         // GET: Projects
@@ -34,11 +34,11 @@ namespace IssueTracker.Controllers
             {
                 return RedirectToAction("Index", "Authorization");
             }
-
-            var userId = int.Parse(HttpContext.Session.GetString("UserId") ?? "-1");
+            // TODO ADD NOTYF
+            var userId = HttpContext.Session.GetInt32("UserId") ?? -1;
             var projects = _context.GetUserProjects(userId);
 
-            var projectIds = _context.Projects.Select(proj => proj.ProjectId);
+            var projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
             ViewData["ProjectIds"] = projectIds;
 
             var issues = _context.Issues.ToList();
@@ -48,30 +48,35 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Projects/Details
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id, int userId)
         {
             if (IsNotLogged())
             {
                 return RedirectToAction("Index", "Authorization");
             }
 
-            if (id == null)
+            if (id == null || userId < 0)
             {
-                return RedirectToAction("Index", "Authorization");
+                return RedirectToAction("Index");
             }
 
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
+            var project = _context.Projects
+                .FirstOrDefault(m => m.ProjectId == id);
             if (project == null)
             {
                 return View("Index");
             }
 
-            var projectIds = _context.Projects.Select(proj => proj.ProjectId);
+            var projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
             ViewData["ProjectIds"] = projectIds;
 
             var issues = _context.Issues.ToList();
             ViewData["Issues"] = issues;
+            string projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
+            ViewData["ProjectLead"] = projectLead;
+            ViewData["UserRole"] = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
+            ViewData["ProjectUsers"] = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role != ProjectRole.Manager).Select(pers => pers.Person.Email);
+            ViewData["AllUsers"] = _context.Persons.Select(pers => pers.Email);
 
             return View(project);
         }
@@ -113,6 +118,27 @@ namespace IssueTracker.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Index");
+        }
+
+        public IActionResult InviteDeveloper(string email, int projectId)
+        {
+            int userId = _context.Persons.FirstOrDefault(pers => pers.Email == email).PersonId;
+
+            PersonProject personProject = new()
+            {
+                PersonId = userId,
+                ProjectId = projectId,
+                Role = ProjectRole.Developer
+            };
+            // TODO ADD NOTYF ALSO DONT ADD ALREADY ADDED
+            var project = _context.Projects.FirstOrDefault(proj => proj.ProjectId == projectId);
+
+            personProject.Project = project;
+            personProject.Person = _context.Persons.FirstOrDefault(x => x.PersonId == personProject.PersonId);
+            _context.PersonProjects.Add(personProject);
+            _context.SaveChanges();
+
+            return RedirectToAction("Details");
         }
 
         // GET: Projects/Edit
