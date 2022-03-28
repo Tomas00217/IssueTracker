@@ -27,8 +27,11 @@
         <dt class = "col-sm-3">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-9">
+        <dd class = "col-sm-7">
             @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dd class = "col-sm-2">
+            <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
         </dd>
         <dt class = "col-sm-3">
             People working on this project:
@@ -39,20 +42,22 @@
         <dt class = "col-sm-3">
             Project Lead:
         </dt>
-        <dd class = "col-sm-9">
+        <dd class = "col-sm-7">
             @if (@ViewBag.ProjectLead == null)
             {
                 <p> Project does not have a project lead </p>
-                if (@ViewBag.UserRole == ProjectRole.Manager)
-                {
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#projectLead">
-                        Set Project Lead
-                    </button>
-                    <partial name="_SetProjectLeadModal"/>
-                }
             } else
             {
                 @ViewBag.ProjectLead
+            }
+        </dd>
+        <dd class = "col-sm-2">
+            @if (@ViewBag.UserRole == ProjectRole.Manager)
+            {
+                <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#projectLead">
+                    Set Project Lead
+                </button>
+                <partial name="_SetProjectLeadModal"/>
             }
         </dd>
         <dt class = "col-sm-3">
@@ -88,11 +93,43 @@
     </dl>
 </div>
 <div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
-    <partial name="_AddToProjectModal"/>
-    <a asp-controller="Issues" asp-action="Create">Create issue</a>
+    <div class="collapse overflow-auto" id="collapseUsers">
+        <div class="card card-body">
+            @foreach (var user in ViewBag.ProjectUsers)
+            {
+                <div>
+                @user.FirstName
+                @user.SecondName
+                @user.Email
+                </div>
+            }
+        </div>
+    </div>
+    <div class="collapse overflow-auto" id="collapseIssues">
+        <div class="card card-body">
+            @foreach (var issue in ViewBag.Issues)
+            {
+                <div>
+                @issue.Summary
+                @issue.State
+                @issue.Priority
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="float-end">
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
+        Show Users
+    </button>
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIssues" aria-expanded="false" aria-controls="collapseIssues">
+        Show Issues
+    </button>
+    
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.ProjectId">Edit</a> |
+    <partial name="_AddToProjectModal"/>
+    <a asp-action="Edit" asp-route-id="@Model?.ProjectId">Edit</a>
     <a asp-action="Index">Back to List</a>
+    <a asp-controller="Issues" asp-action="Create">Go to create issue</a>
 </div>

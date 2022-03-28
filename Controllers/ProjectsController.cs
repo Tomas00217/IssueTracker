@@ -73,7 +73,7 @@ namespace IssueTracker.Controllers
 
             ViewData["Issues"] = _context.Issues.ToList();
             ViewData["UserRole"] = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
-            ViewData["ProjectUsers"] = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role != ProjectRole.Manager).Select(pers => pers.Person.Email);
+            ViewData["ProjectUsers"] = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role != ProjectRole.Manager).Select(pers => pers.Person);
             ViewData["AllUsers"] = _context.Persons.Select(pers => pers.Email);
 
             return View(project);
@@ -81,6 +81,9 @@ namespace IssueTracker.Controllers
 
         public IActionResult InviteDeveloper(string email, int projectId)
         {
+
+            // TODO: INVITE UNKNOW USER
+
             int currentUserId = HttpContext.Session.GetInt32("UserId") ?? -1;
             int userIdToAdd = _context.Persons.FirstOrDefault(pers => pers.Email == email).PersonId;
 

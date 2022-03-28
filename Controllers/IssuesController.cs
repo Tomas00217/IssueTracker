@@ -75,7 +75,7 @@ namespace IssueTracker.Controllers
 
         private int GetUserId()
         {
-            return int.Parse(HttpContext.Session.GetString("UserId") ?? "-1");
+            return HttpContext.Session.GetInt32("UserId") ?? -1;
         }
     }
 }
