@@ -1,4 +1,4 @@
-﻿@model IssueTracker.Models.Project
+﻿@model IssueTracker.Models.ProjectDetails;
 
 @{
     ViewData["Title"] = "Details";
@@ -7,13 +7,13 @@
 @functions {
     public int getPeopleCount(int projectId)
     {
-        IQueryable<int> projectIds = ViewBag.ProjectIds;
+        IQueryable<int> projectIds = Model.projectIds;
         return projectIds.Where(id => id == projectId).Count();
     }
 
     public int getIssueCount(int projectId)
     {
-        List<Issue> issues = ViewBag.Issues;
+        List<Issue> issues = Model.issues;
         return issues.Where(issue => issue.ProjectId == projectId).Count();
     }
 }
@@ -25,10 +25,10 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Project.Name)
         </dt>
         <dd class = "col-sm-7">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Project.Name)
         </dd>
         <dd class = "col-sm-2">
             <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
@@ -37,22 +37,22 @@
             People working on this project:
         </dt>
         <dd class = "col-sm-9">
-            @getPeopleCount(@Model.ProjectId)
+            @getPeopleCount(@Model.Project.ProjectId)
         </dd>
         <dt class = "col-sm-3">
             Project Lead:
         </dt>
         <dd class = "col-sm-7">
-            @if (@ViewBag.ProjectLead == null)
+            @if (Model.projectLead == null)
             {
                 <p> Project does not have a project lead </p>
             } else
             {
-                @ViewBag.ProjectLead
+                @Model.projectLead
             }
         </dd>
         <dd class = "col-sm-2">
-            @if (@ViewBag.UserRole == ProjectRole.Manager)
+            @if (@Model.userRole == ProjectRole.Manager)
             {
                 <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#projectLead">
                     Set Project Lead
@@ -64,50 +64,51 @@
             Number of issues:
         </dt>
         <dd class = "col-sm-9">
-            @getIssueCount(@Model.ProjectId)
+            @getIssueCount(@Model.Project.ProjectId)
         </dd>
         <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.StartDate)
+            @Html.DisplayNameFor(model => model.Project.StartDate)
         </dt>
         <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.StartDate)
+            @Html.DisplayFor(model => model.Project.StartDate)
         </dd>
         <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.TargetEndDate)
+            @Html.DisplayNameFor(model => model.Project.TargetEndDate)
         </dt>
         <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.TargetEndDate)
+            @Html.DisplayFor(model => model.Project.TargetEndDate)
         </dd>
         <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.ActualEndDate)
+            @Html.DisplayNameFor(model => model.Project.ActualEndDate)
         </dt>
         <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.ActualEndDate)
+            @Html.DisplayFor(model => model.Project.ActualEndDate)
         </dd>
         <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.CreatedOn)
+            @Html.DisplayNameFor(model => model.Project.CreatedOn)
         </dt>
         <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.CreatedOn)
+            @Html.DisplayFor(model => model.Project.CreatedOn)
         </dd>
     </dl>
 </div>
 <div>
     <div class="collapse overflow-auto" id="collapseUsers">
         <div class="card card-body">
-            @foreach (var user in ViewBag.ProjectUsers)
+            @foreach (var pp in Model.personProjects)
             {
                 <div>
-                @user.FirstName
-                @user.SecondName
-                @user.Email
+                @pp.Person.FirstName
+                @pp.Person.SecondName
+                @pp.Person.Email
+                @pp.Role
                 </div>
             }
         </div>
     </div>
     <div class="collapse overflow-auto" id="collapseIssues">
         <div class="card card-body">
-            @foreach (var issue in ViewBag.Issues)
+            @foreach (var issue in Model.issues)
             {
                 <div>
                 @issue.Summary
@@ -129,7 +130,7 @@
 </div>
 <div>
     <partial name="_AddToProjectModal"/>
-    <a asp-action="Edit" asp-route-id="@Model?.ProjectId">Edit</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Project.ProjectId">Edit</a>
     <a asp-action="Index">Back to List</a>
     <a asp-controller="Issues" asp-action="Create">Go to create issue</a>
 </div>

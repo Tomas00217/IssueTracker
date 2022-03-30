@@ -46,7 +46,7 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Projects/Details
-        public IActionResult Details(int? id, int userId)
+        public IActionResult Details(int? id, int userId, ProjectDetails projectDetails)
         {
             if (IsNotLogged())
             {
@@ -65,27 +65,30 @@ namespace IssueTracker.Controllers
                 return View("Index");
             }
 
-            var projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
-            ViewData["ProjectIds"] = projectIds;
+            projectDetails.Project = project;
+            projectDetails.projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
+            projectDetails.projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
+            projectDetails.issues = _context.Issues.ToList();
+            projectDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
+            projectDetails.personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
+            projectDetails.allUsers = _context.Persons.ToList();
 
-            string projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
-            ViewData["ProjectLead"] = projectLead;
-
-            ViewData["Issues"] = _context.Issues.ToList();
-            ViewData["UserRole"] = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
-            ViewData["ProjectUsers"] = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role != ProjectRole.Manager).Select(pers => pers.Person);
-            ViewData["AllUsers"] = _context.Persons.Select(pers => pers.Email);
-
-            return View(project);
+            return View(projectDetails);
         }
 
         public IActionResult InviteDeveloper(string email, int projectId)
         {
 
-            // TODO: INVITE UNKNOW USER
-
             int currentUserId = HttpContext.Session.GetInt32("UserId") ?? -1;
-            int userIdToAdd = _context.Persons.FirstOrDefault(pers => pers.Email == email).PersonId;
+            Person userToAdd = _context.Persons.FirstOrDefault(pers => pers.Email == email);
+
+            if (userToAdd == null)
+            {
+                _notyf.Error("User with email " + email + " does not exist");
+                return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
+            }
+
+            int userIdToAdd = userToAdd.PersonId;
 
             if (_context.PersonProjects.Where(pp => pp.PersonId == userIdToAdd && pp.ProjectId == projectId).Any())
             {

@@ -14,9 +14,12 @@
                 <label class="control-label">Pick User</label>
                 <input name="email" class="form-control" list="datalistOptions" placeholder="Type to search...">
                 <datalist id="datalistOptions">
-                    @foreach (var user in ViewBag.ProjectUsers)
+                    @foreach (var person in Model.personProjects)
                     {
-                        <option value="@user.Email"/>
+                        if (person.Role != ProjectRole.Manager)
+                        {
+                            <option value="@person.Person.Email"/>
+                        }
                     }
                 </datalist>
             </div>

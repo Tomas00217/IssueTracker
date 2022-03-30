@@ -13,11 +13,11 @@
             <div class="form-group">
                 <label class="control-label">Pick User</label>
                 <input name="email" class="form-control" list="datalistInviteUser" placeholder="Type to search...">
-                <input name="projectId" value="@Model.ProjectId" hidden>
+                <input name="projectId" value="@Model.Project.ProjectId" hidden>
                 <datalist id="datalistInviteUser">
-                    @foreach (var user in ViewBag.AllUsers)
+                    @foreach (var user in Model.allUsers)
                     {
-                        <option value="@user"/>
+                        <option value="@user.Email"/>
                     }
                 </datalist>
             </div>
