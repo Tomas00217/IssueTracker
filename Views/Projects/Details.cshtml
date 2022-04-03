@@ -52,7 +52,7 @@
             }
         </dd>
         <dd class = "col-sm-2">
-            @if (@Model.userRole == ProjectRole.Manager)
+            @if (@Model.userRole == ProjectRole.Manager && Model.projectLead == null)
             {
                 <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#projectLead">
                     Set Project Lead
@@ -82,7 +82,14 @@
             @Html.DisplayNameFor(model => model.Project.ActualEndDate)
         </dt>
         <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.Project.ActualEndDate)
+            @if (Model.Project.ActualEndDate.CompareTo(DateTime.MinValue) == 0)
+            {
+                <p> Project has not ended </p>
+            }
+            else
+            {
+                @Html.DisplayFor(model => model.Project.ActualEndDate)
+            }
         </dd>
         <dt class = "col-sm-3">
             @Html.DisplayNameFor(model => model.Project.CreatedOn)
@@ -98,9 +105,9 @@
             @foreach (var pp in Model.personProjects)
             {
                 <div>
-                @pp.Person.FirstName
-                @pp.Person.SecondName
-                @pp.Person.Email
+                @pp.Person?.FirstName
+                @pp.Person?.SecondName
+                @pp.Person?.Email
                 @pp.Role
                 </div>
             }
@@ -130,7 +137,7 @@
 </div>
 <div>
     <partial name="_AddToProjectModal"/>
-    <a asp-action="Edit" asp-route-id="@Model?.Project.ProjectId">Edit</a>
     <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Project.ProjectId">Edit</a>
     <a asp-controller="Issues" asp-action="Create">Go to create issue</a>
 </div>

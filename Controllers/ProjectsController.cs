@@ -114,6 +114,34 @@ namespace IssueTracker.Controllers
             return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
         }
 
+        public IActionResult SetProjectLead(string email, int projectId)
+        {
+            int currentUserId = HttpContext.Session.GetInt32("UserId") ?? -1;
+
+            var project = _context.Projects.FirstOrDefault(proj => proj.ProjectId == projectId);
+            var person = _context.Persons.FirstOrDefault(pers => pers.Email == email);
+
+            if (project == null || person == null)
+            {
+                _notyf.Error("Project or user does not exist");
+                return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
+            }
+
+            var personProject = _context.PersonProjects.FirstOrDefault(pp => pp.Person.Email == email && pp.ProjectId == projectId);
+
+            if (personProject == null)
+            {
+                _notyf.Error("User is not part of project");
+                return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
+            }
+
+            personProject.Role = ProjectRole.ProjectLead;
+            _context.SaveChanges();
+
+            _notyf.Success("Project lead sucessfuly set");
+            return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
+        }
+
         // GET: Projects/Create
         public IActionResult Create()
         {
@@ -203,32 +231,14 @@ namespace IssueTracker.Controllers
             return View(projectToUpdate);
         }
 
-        // GET: Projects/Delete
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return RedirectToAction("Index", "Authorization");
-            }
-
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
-
-            return View(project);
-        }
-
         // POST: Projects/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var project = await _context.Projects.FindAsync(id);
+        public IActionResult Delete(int id)
+        {   
+            var project = _context.Projects.Find(id);
             _context.Projects.Remove(project);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             _notyf.Success("Project sucessfuly deleted");
             return RedirectToAction(nameof(Index));

@@ -1,0 +1,27 @@
+﻿<!-- Modal -->
+<div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="delete">Delete project</h5>
+        <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="Delete">
+            <div class="form-group proj">
+                <p></p>
+                <input name="id" id="projId" hidden>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-danger" value="Delete" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

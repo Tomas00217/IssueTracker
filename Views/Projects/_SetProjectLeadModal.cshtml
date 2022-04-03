@@ -13,6 +13,7 @@
             <div class="form-group">
                 <label class="control-label">Pick User</label>
                 <input name="email" class="form-control" list="datalistOptions" placeholder="Type to search...">
+                <input name="projectId" value="@Model.Project.ProjectId" hidden>
                 <datalist id="datalistOptions">
                     @foreach (var person in Model.personProjects)
                     {
@@ -23,14 +24,13 @@
                     }
                 </datalist>
             </div>
-            <div class="form-group">
-                <input type="submit" value="SetProjectLead" class="btn btn-primary" />
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="form-group">
+                    <input type="submit" value="Set Project Lead" class="btn btn-primary" />
+                </div>
             </div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
       </div>
     </div>
   </div>

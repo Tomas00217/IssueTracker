@@ -55,7 +55,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -73,20 +73,51 @@
                 @Html.DisplayFor(modelItem => item.TargetEndDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ActualEndDate)
+                @if (item.ActualEndDate.CompareTo(DateTime.MinValue) == 0)
+                {
+                    if ((item.TargetEndDate).CompareTo(DateTime.Now) < 0)
+                    {
+                            <p> Project is overdue! </p>
+                        }
+                    else
+                    {
+                        <p> Project is in progress </p>
+                    }
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.ActualEndDate)
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedOn)
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProjectId">Delete</a>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
+                <partial name="_DeleteProjectModal"></partial>
             </td>
         </tr>
-}
+        }     
     </tbody>
 </table>
 
 <a class="btn btn-primary" asp-action="Create">
     Create new project
 </a>
+
+<script>
+    var exampleModal = document.getElementById('delete')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget
+
+    var id = button.getAttribute('data-bs-projId')
+    var name = button.getAttribute('data-bs-projName')
+
+    var modalBodyInput = exampleModal.querySelector('.proj input')
+    var modalBodyParagraph = exampleModal.querySelector('.proj p')
+    
+    modalBodyParagraph.innerHTML = "Are you sure you want to delete project: " + name + "?"
+    modalBodyInput.value = id
+    })
+</script>

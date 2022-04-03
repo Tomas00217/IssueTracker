@@ -25,7 +25,7 @@
                 @Html.DisplayNameFor(model => model.Priority)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TargetResolutionDate)
+                Date due
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Asignee)
@@ -56,6 +56,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.TargetResolutionDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Asignee)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Creator.Email)
