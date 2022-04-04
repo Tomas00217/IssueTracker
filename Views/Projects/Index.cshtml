@@ -27,11 +27,27 @@
 
 <h4>@ViewData["Title"]</h4>
 
+<form asp-controller="Projects" asp-action="Index" method="get">
+    <p>
+        Name: <input type="text" name="SearchString" />
+        <input type="submit" class="btn btn-primary" value="Filter"/>
+    </p>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["NameSort"]">@Html.DisplayNameFor(model => model.Name) 
+                    @if (@ViewData["NameSort"] == "NameDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    }                    
+                </a>
             </th>
             <th>
                 People
@@ -40,16 +56,40 @@
                 Issues
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.StartDate)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["StartDateSort"]">@Html.DisplayNameFor(model => model.StartDate)
+                    @if (@ViewData["StartDateSort"] == "StartDateDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    }      
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TargetEndDate)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["TargetDateSort"]">@Html.DisplayNameFor(model => model.TargetEndDate) 
+                    @if (@ViewData["TargetDateSort"] == "TargetDateDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    }    
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ActualEndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedOn)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["StatusSort"]">Status 
+                    @if (@ViewData["StatusSort"] == "StatusDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    }    
+                </a>
             </th>
             <th></th>
         </tr>
@@ -77,27 +117,24 @@
                 {
                     if ((item.TargetEndDate).CompareTo(DateTime.Now) < 0)
                     {
-                            <p> Project is overdue! </p>
-                        }
+                            <p>Overdue</p>
+                    }
                     else
                     {
-                        <p> Project is in progress </p>
+                        <p>In Progress</p>
                     }
                 }
                 else
                 {
-                    @Html.DisplayFor(modelItem => item.ActualEndDate)
+                    <p>Done</p>
                 }
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a> |
+                <a type="button" class="btn btn-primary" asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a> |
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
                 <partial name="_DeleteProjectModal"></partial>
             </td>
-        </tr>
+        </tr> 
         }     
     </tbody>
 </table>

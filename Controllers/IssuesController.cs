@@ -17,9 +17,9 @@ namespace IssueTracker.Controllers
         }
         private Boolean IsNotLogged()
         {
-            String idStr = HttpContext.Session.GetString("UserId") ?? "";
+            int? id = HttpContext.Session.GetInt32("UserId");
 
-            return idStr == null || idStr.Length <= 0;
+            return id == null || id < 0;
         }
 
         public IActionResult Index()
@@ -28,8 +28,9 @@ namespace IssueTracker.Controllers
             {
                 return RedirectToAction("Index", "Authorization");
             }
+            var user = _context?.Persons?.Find(GetUserId());
 
-            var issueTrackerContext = _context?.Issues?.Include(i => i.Creator).Include(i => i.Project);
+            var issueTrackerContext = _context?.Issues?.Where(i => i.CreatorId == GetUserId()).Include(i => i.Creator).Include(i => i.Project);
             return View(issueTrackerContext.ToList());
         }
 
@@ -66,6 +67,7 @@ namespace IssueTracker.Controllers
             issue.CreatedOn = DateTime.Now;
             issue.CreatorId = userId;
             issue.State = IssueStatus.New;
+            issue.Creator = creator;
 
             _context?.Add(issue);
             _context?.SaveChanges();

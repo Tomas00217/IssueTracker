@@ -26,7 +26,7 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Projects
-        public IActionResult Index()
+        public IActionResult Index(string searchString, string sortOrder)
         {
             if (IsNotLogged())
             {
@@ -34,7 +34,45 @@ namespace IssueTracker.Controllers
             }
             
             var userId = HttpContext.Session.GetInt32("UserId") ?? -1;
-            var projects = _context.GetUserProjects(userId);
+            var projects = from m in _context.GetUserProjects(userId) select m;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                projects = projects.Where(p => p.Name.Contains(searchString));
+            }
+
+            ViewData["NameSort"] = String.IsNullOrEmpty(sortOrder) ? "NameDesc" : "";
+            ViewData["StartDateSort"] = sortOrder == "StartDate" ? "StartDateDesc" : "StartDate";
+            ViewData["TargetDateSort"] = sortOrder == "TargetDate" ? "TargetDateDesc" : "TargetDate";
+            ViewData["StatusSort"] = sortOrder == "Status" ? "StatusDesc" : "Status";
+
+            switch (sortOrder)
+            {
+                case "NameDesc":
+                    projects = projects.OrderByDescending(p => p.Name);
+                    break;
+                case "StartDate":
+                    projects = projects.OrderBy(p => p.StartDate);
+                    break;
+                case "StartDateDesc":
+                    projects = projects.OrderByDescending(p => p.StartDate);
+                    break;
+                case "TargetDate":
+                    projects = projects.OrderBy(p => p.TargetEndDate);
+                    break;
+                case "TargetDateDesc":
+                    projects = projects.OrderByDescending(p => p.TargetEndDate);
+                    break;
+                case "Status":
+                    projects = projects.OrderBy(p => p.TargetEndDate);
+                    break;
+                case "StatusDesc":
+                    projects = projects.OrderByDescending(p => p.TargetEndDate);
+                    break;
+                default:
+                    projects = projects.OrderBy(p => p.Name);
+                    break;
+            }
 
             var projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
             ViewData["ProjectIds"] = projectIds;
