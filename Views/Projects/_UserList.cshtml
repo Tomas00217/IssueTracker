@@ -1,0 +1,49 @@
+﻿@model IssueTracker.Models.ProjectDetails;
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
+
+<style>
+    td {
+        vertical-align: middle!important;
+    }
+</style>
+
+<div class="collapse overflow-auto" id="collapseUsers">
+    <div class="card card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th><span class="m-1 float-end">Action</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pp in Model.personProjects)
+                {
+                    <tr>
+                    <td>@pp.Person?.FirstName @pp.Person?.SecondName</td>
+                    <td>@pp.Person?.Email</td>
+                    <td>@pp.Role</td>
+                    <td>
+                    @if (Model.userRole != ProjectRole.Developer)
+                    {
+                        if (Model.userRole == ProjectRole.ProjectLead && pp.Role == ProjectRole.Manager && (@httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1) != 1)
+                        {
+                        <span type="button" class="btn btn-danger m-1 float-end opacity-50 disabled">Remove</span>
+                        } else
+                        {
+                        <a type="button" class="btn btn-danger m-1 float-end" asp-action="RemoveFromProject" asp-route-userId="@pp.PersonId" asp-route-currentRole="@Model.userRole">
+                            Remove
+                        </a> 
+                        }
+                    }
+                    </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>

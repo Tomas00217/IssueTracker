@@ -22,16 +22,100 @@ namespace IssueTracker.Controllers
             return id == null || id < 0;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string searchString, string sortOrder, string sortType)
         {
             if (IsNotLogged())
             {
                 return RedirectToAction("Index", "Authorization");
             }
-            var user = _context?.Persons?.Find(GetUserId());
+            var userId = HttpContext.Session.GetInt32("UserId") ?? -1;
 
-            var issueTrackerContext = _context?.Issues?.Where(i => i.CreatorId == GetUserId()).Include(i => i.Creator).Include(i => i.Project);
-            return View(issueTrackerContext.ToList());
+            var personProjectsIds = _context?.PersonProjects?.Where(p => p.PersonId == userId).Select(p => p.ProjectId);
+
+            var issues = from m in _context?.Issues?
+                .Where(i => personProjectsIds.Contains(i.ProjectId))
+                .Include(i => i.Creator).Include(i => i.Project)
+                         select m;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                issues = issues.Where(i => i.Summary.Contains(searchString));
+            }
+
+            ViewData["SummarySort"] = String.IsNullOrEmpty(sortOrder) ? "SummaryDesc" : "";
+            ViewData["ProjectSort"] = sortOrder == "ProjectSort" ? "ProjectDesc" : "ProjectSort";
+            ViewData["StateSort"] = sortOrder == "StateSort" ? "StateDesc" : "StateSort";
+            ViewData["PrioritySort"] = sortOrder == "PrioritySort" ? "PriorityDesc" : "PrioritySort";
+
+            switch (sortOrder)
+            {
+                case "SummaryDesc":
+                    issues = issues.OrderByDescending(i => i.Summary);
+                    break;
+                case "ProjectSort":
+                    issues = issues.OrderBy(i => i.Project.Name);
+                    break;
+                case "ProjectDesc":
+                    issues = issues.OrderByDescending(i => i.Project.Name);
+                    break;
+                case "StateSort":
+                    issues = issues.OrderBy(i => i.State);
+                    break;
+                case "StateDesc":
+                    issues = issues.OrderByDescending(i => i.State);
+                    break;
+                case "PrioritySort":
+                    issues = issues.OrderBy(i => i.Priority);
+                    break;
+                case "PriorityDesc":
+                    issues = issues.OrderByDescending(i => i.Priority);
+                    break;
+                default:
+                    issues = issues.OrderBy(i => i.Summary);
+                    break;
+            }
+
+            ViewData["MyIssues"] = String.IsNullOrEmpty(sortType) ? "MyIssues" : "";
+            ViewData["PriorityHigh"] = sortType != "PriorityHigh" ? "PriorityHigh" : "";
+            ViewData["PriorityMedium"] = sortType != "PriorityMedium" ? "PriorityMedium" : "";
+            ViewData["PriorityLow"] = sortType != "PriorityLow" ? "PriorityLow" : "";
+            ViewData["StateNew"] = sortType != "StateNew" ? "StateNew" : "";
+            ViewData["StateActive"] = sortType != "StateActive" ? "StateActive" : "";
+            ViewData["StateResolved"] = sortType != "StateResolved" ? "StateResolved" : "";
+            ViewData["StateClosed"] = sortType != "StateClosed" ? "StateClosed" : "";
+
+            switch (sortType)
+            {
+                case "MyIssues":
+                    issues = issues.Where(i => i.AsigneeId == userId || i.CreatorId == userId);
+                    break;
+                case "PriorityHigh":
+                    issues = issues.Where(i => i.Priority == IssuePriority.High);
+                    break;
+                case "PriorityMedium":
+                    issues = issues.Where(i => i.Priority == IssuePriority.Medium);
+                    break;
+                case "PriorityLow":
+                    issues = issues.Where(i => i.Priority == IssuePriority.Low);
+                    break;
+                case "StateNew":
+                    issues = issues.Where(i => i.State == IssueStatus.New);
+                    break;
+                case "StateActive":
+                    issues = issues.Where(i => i.State == IssueStatus.Active);
+                    break;
+                case "StateResolved":
+                    issues = issues.Where(i => i.State == IssueStatus.Resolved);
+                    break;
+                case "StateClosed":
+                    issues = issues.Where(i => i.State == IssueStatus.Closed);
+                    break;
+                default:
+                    issues = issues.OrderBy(i => i.Summary);
+                    break;
+            }
+
+            return View(issues);
         }
 
         // GET

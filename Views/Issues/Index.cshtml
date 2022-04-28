@@ -6,23 +6,91 @@
 
 <h4>@ViewData["Title"]</h4>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div>
+    <form class="d-inline" asp-controller="Issues" asp-action="Index" method="get">
+        <div class="d-inline">
+            Summary: <input type="text" name="SearchString" />
+            <input type="submit" class="btn btn-primary" value="Filter"/>
+        </div>
+    </form>
+    <a class="btn btn-primary d-inline" asp-action="Index" asp-route-sortType="@ViewData["MyIssues"]">My issues</a>
+    <div class="dropdown d-inline">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="StateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        State
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="StateDropdown">
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateNew"]">New</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateActive"]">Active</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateResolved"]">Resolved</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateClosed"]">Closed</a></li>
+      </ul>
+    </div>    
+    <div class="dropdown d-inline">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="PriorityDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        Priority
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="PriorityDropdown">
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["PriorityHigh"]">High</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["PriorityMedium"]">Medium</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["PriorityLow"]">Low</a></li>
+      </ul>
+    </div> 
+</div>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Summary)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["SummarySort"]">
+                    @Html.DisplayNameFor(model => model.Summary)
+                    @if (@ViewData["SummarySort"] == "SummaryDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    } 
+                </a>    
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Project)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["ProjectSort"]">
+                    @Html.DisplayNameFor(model => model.Project)
+                    @if (@ViewData["ProjectSort"] == "ProjectDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    } 
+                </a> 
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.State)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["StateSort"]">
+                    @Html.DisplayNameFor(model => model.State)
+                    @if (@ViewData["StateSort"] == "StateDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    } 
+                </a> 
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Priority)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["PrioritySort"]">
+                    @Html.DisplayNameFor(model => model.Priority)
+                    @if (@ViewData["PrioritySort"] == "PriorityDesc")
+                    {
+                        <i class="fa fa-arrow-down"></i>
+                    }
+                    else
+                    {
+                       <i class="fa fa-arrow-up"></i>  
+                    } 
+                </a> 
             </th>
             <th>
                 Date due
@@ -32,9 +100,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Creator)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedOn)
             </th>
             <th></th>
         </tr>
@@ -58,20 +123,22 @@
                 @Html.DisplayFor(modelItem => item.TargetResolutionDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Asignee)
+                @Html.DisplayFor(modelItem => item.Asignee.Email)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Creator.Email)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a class="btn-primary btn" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                | <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<p>
+    <a class="btn-primary btn" asp-action="Create">
+        Create New Issue
+    </a>
+</p>

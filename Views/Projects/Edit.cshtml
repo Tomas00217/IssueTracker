@@ -1,7 +1,16 @@
 ﻿@model IssueTracker.Models.Project
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
 
 @{
     ViewData["Title"] = "Edit";
+}
+
+@functions {
+    public int getUserId()
+    {
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
+    }
 }
 
 <h1>Edit</h1>
@@ -41,7 +50,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Details" asp-route-id="@Model.ProjectId" asp-route-userId="@getUserId()">Back to Details</a>
 </div>
 
 @section Scripts {

@@ -1,0 +1,59 @@
+﻿@model IEnumerable<IssueTracker.Models.Issue>
+
+@functions {
+    public int showItems(int index)
+    {
+        int count = Model.Count() > 5 ? 5 : Model.Count();
+        int pos = index;
+        for (int i = 0; i < count; i++)
+        {
+            pos = index + i;
+            Issue issue = Model.ElementAt(pos);
+            <tr>
+                <td>@issue.Summary</td>
+                <td>@issue.State</td>
+                <td>@issue.Priority</td>
+                <td>
+                    @if (@issue.Asignee != null)
+                    {
+                        @issue.Asignee.Email
+                    }
+                    else
+                    {
+                        <span class="text-muted">Unassigned</span>
+                    }
+                </td>
+                <td>@issue.Creator.Email</td>
+            </tr>
+        }
+        return index + count;
+    }
+
+    public async Task OnPostShowItems(int index)
+    {
+        showItems(index);
+    }
+}
+    
+<div class="collapse overflow-auto" id="collapseIssues">
+    <div class="card card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Issue</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Assignee</th>
+                    <th>Creator</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int index = 0;
+                    index = showItems(index);
+                }
+            </tbody>
+        </table>
+        <a asp-controller="Issues" asp-action="Create">Create new</a>
+    </div>
+</div>

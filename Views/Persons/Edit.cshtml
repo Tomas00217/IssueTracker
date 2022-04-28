@@ -30,9 +30,24 @@
 </div>
 
 <div>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete" data-bs-accId="@Model?.PersonId">Delete</button>
+    <partial name="_DeleteAccountModal"></partial>
     <a asp-action="Profile">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+<script>
+    var exampleModal = document.getElementById('delete')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget
+
+    var id = button.getAttribute('data-bs-accId')
+
+    var modalBodyInput = exampleModal.querySelector('.acc input')
+    
+    modalBodyInput.value = id
+    })
+</script>

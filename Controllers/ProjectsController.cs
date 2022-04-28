@@ -86,27 +86,22 @@ namespace IssueTracker.Controllers
         // GET: Projects/Details
         public IActionResult Details(int? id, int userId, ProjectDetails projectDetails)
         {
-            if (IsNotLogged())
+            if (IsNotLogged() || userId != HttpContext.Session.GetInt32("UserId"))
             {
                 return RedirectToAction("Index", "Authorization");
-            }
-
-            if (id == null || userId < 0)
-            {
-                return RedirectToAction("Index");
             }
 
             var project = _context.Projects
                 .FirstOrDefault(m => m.ProjectId == id);
             if (project == null)
             {
-                return View("Index");
+                return RedirectToAction("Index");
             }
 
             projectDetails.Project = project;
             projectDetails.projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
             projectDetails.projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
-            projectDetails.issues = _context.Issues.ToList();
+            projectDetails.issues = _context.Issues.Where(i => i.ProjectId == id).ToList();
             projectDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
             projectDetails.personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
             projectDetails.allUsers = _context.Persons.ToList();
@@ -178,6 +173,37 @@ namespace IssueTracker.Controllers
 
             _notyf.Success("Project lead sucessfuly set");
             return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
+        }
+
+        public IActionResult RemoveFromProject(int userId, ProjectRole currentRole)
+        {
+            int currentUserId = HttpContext.Session.GetInt32("UserId") ?? -1;
+
+            var personProject = _context.PersonProjects.FirstOrDefault(pp => pp.PersonId == userId);
+
+            if (currentRole == ProjectRole.Developer)
+            {
+                _notyf.Error("Invalid action");
+                return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
+            }
+            
+            if (personProject == null)
+            {
+                _notyf.Error("User is not part of project");
+                return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
+            } 
+            
+            if (personProject.Role == ProjectRole.Manager && currentRole != ProjectRole.Manager)
+            {
+                _notyf.Error("Only manager can remove manager");
+                return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
+            }
+            
+            _context.PersonProjects.Remove(personProject);
+            _context.SaveChanges();
+
+            _notyf.Success("User sucessfuly removed from project");
+            return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
         }
 
         // GET: Projects/Create

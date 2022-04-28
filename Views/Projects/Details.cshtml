@@ -1,4 +1,6 @@
 ﻿@model IssueTracker.Models.ProjectDetails;
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
 
 @{
     ViewData["Title"] = "Details";
@@ -15,6 +17,11 @@
     {
         List<Issue> issues = Model.issues;
         return issues.Where(issue => issue.ProjectId == projectId).Count();
+    }
+
+    public int getUserId()
+    {
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
     }
 }
 
@@ -100,31 +107,8 @@
     </dl>
 </div>
 <div>
-    <div class="collapse overflow-auto" id="collapseUsers">
-        <div class="card card-body">
-            @foreach (var pp in Model.personProjects)
-            {
-                <div>
-                @pp.Person?.FirstName
-                @pp.Person?.SecondName
-                @pp.Person?.Email
-                @pp.Role
-                </div>
-            }
-        </div>
-    </div>
-    <div class="collapse overflow-auto" id="collapseIssues">
-        <div class="card card-body">
-            @foreach (var issue in Model.issues)
-            {
-                <div>
-                @issue.Summary
-                @issue.State
-                @issue.Priority
-                </div>
-            }
-        </div>
-    </div>
+    <partial name="_UserList" model="Model"/>
+    <partial name="_IssueList" model="Model.issues"/>
 </div>
 <div class="float-end">
     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
@@ -135,9 +119,10 @@
     </button>
     
 </div>
-<div>
-    <partial name="_AddToProjectModal"/>
-    <a asp-action="Index">Back to List</a>
-    <a asp-action="Edit" asp-route-id="@Model?.Project.ProjectId">Edit</a>
-    <a asp-controller="Issues" asp-action="Create">Go to create issue</a>
-</div>
+
+<partial name="_AddToProjectModal"/>
+@if (Model.userRole == ProjectRole.Manager || getUserId() == 1)
+{
+    <p><a asp-action="Edit" asp-route-id="@Model.Project.ProjectId">Edit</a></p>
+}
+<p><a asp-action="Index">Back to List</a></p>

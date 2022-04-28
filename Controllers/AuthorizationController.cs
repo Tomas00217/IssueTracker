@@ -79,7 +79,7 @@ namespace IssueTracker.Controllers
 
             if (user == null)
             {
-                _notyf.Error("Unknown email.");
+                _notyf.Error("Account with this email does not exist.");
                 return View("Index");
             }
 
@@ -99,6 +99,7 @@ namespace IssueTracker.Controllers
 
         public IActionResult Logout()
         {
+            Console.WriteLine(ToSHA512("adminko123"));
             HttpContext.Session?.Clear();
             _notyf.Success("Logged out sucessfully.");
             return View("Index");
