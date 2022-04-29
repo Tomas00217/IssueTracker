@@ -1,37 +1,16 @@
-﻿@model IEnumerable<IssueTracker.Models.Issue>
+﻿@model IssueTracker.Models.ProjectDetails;
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
+
+@{
+    var prevDisabled = !Model.issues.PreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.issues.NextPage ? "disabled" : "";   
+}
 
 @functions {
-    public int showItems(int index)
+    public int getUserId()
     {
-        int count = Model.Count() > 5 ? 5 : Model.Count();
-        int pos = index;
-        for (int i = 0; i < count; i++)
-        {
-            pos = index + i;
-            Issue issue = Model.ElementAt(pos);
-            <tr>
-                <td>@issue.Summary</td>
-                <td>@issue.State</td>
-                <td>@issue.Priority</td>
-                <td>
-                    @if (@issue.Asignee != null)
-                    {
-                        @issue.Asignee.Email
-                    }
-                    else
-                    {
-                        <span class="text-muted">Unassigned</span>
-                    }
-                </td>
-                <td>@issue.Creator.Email</td>
-            </tr>
-        }
-        return index + count;
-    }
-
-    public async Task OnPostShowItems(int index)
-    {
-        showItems(index);
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
     }
 }
     
@@ -48,9 +27,23 @@
                 </tr>
             </thead>
             <tbody>
-                @{
-                    int index = 0;
-                    index = showItems(index);
+                @foreach (var issue in Model.issues) {
+                    <tr>
+                        <td>@issue.Summary</td>
+                        <td>@issue.State</td>
+                        <td>@issue.Priority</td>
+                        <td>
+                            @if (@issue.Asignee != null)
+                            {
+                                @issue.Asignee.Email
+                            }
+                            else
+                            {
+                                <span class="text-muted">Unassigned</span>
+                            }
+                        </td>
+                        <td>@issue.Creator.Email</td>
+                    </tr>
                 }
             </tbody>
         </table>

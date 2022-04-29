@@ -1,9 +1,11 @@
-﻿@model IEnumerable<IssueTracker.Models.Project>;
+﻿@model PaginatedList<IssueTracker.Models.Project>;
 @using Microsoft.AspNetCore.Http;
 @inject IHttpContextAccessor httpContextAccessor;
 
 @{
     ViewData["Title"] = "Projects";
+    var prevDisabled = !Model.PreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.NextPage ? "disabled" : "";   
 }
 
 @functions {
@@ -38,7 +40,7 @@
     <thead>
         <tr>
             <th>
-                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["NameSort"]">@Html.DisplayNameFor(model => model.Name) 
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["NameSort"]">Name 
                     @if (@ViewData["NameSort"] == "NameDesc")
                     {
                         <i class="fa fa-arrow-down"></i>
@@ -56,7 +58,7 @@
                 Issues
             </th>
             <th>
-                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["StartDateSort"]">@Html.DisplayNameFor(model => model.StartDate)
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["StartDateSort"]">StartDate
                     @if (@ViewData["StartDateSort"] == "StartDateDesc")
                     {
                         <i class="fa fa-arrow-down"></i>
@@ -68,7 +70,7 @@
                 </a>
             </th>
             <th>
-                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["TargetDateSort"]">@Html.DisplayNameFor(model => model.TargetEndDate) 
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["TargetDateSort"]">EndDate 
                     @if (@ViewData["TargetDateSort"] == "TargetDateDesc")
                     {
                         <i class="fa fa-arrow-down"></i>
@@ -139,8 +141,16 @@
     </tbody>
 </table>
 
-<a class="btn btn-primary" asp-action="Create">
+<a class="btn btn-primary m-1" asp-action="Create">
     Create new project
+</a>
+
+<a class ="btn-primary btn m-1 float-end @prevDisabled" asp-action="Index" asp-route-PageNumber="@(Model.PageIndex - 1)">
+    Previous
+</a>
+
+<a class = "btn-primary btn m-1 float-end @nextDisabled" asp-action="Index" asp-route-PageNumber="@(Model.PageIndex + 1)">
+    Next
 </a>
 
 <script>

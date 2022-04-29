@@ -11,7 +11,7 @@ namespace IssueTracker.Models
 
         public string projectLead;
 
-        public List<Issue> issues;
+        public PaginatedList<Issue> issues;
 
         public ProjectRole userRole;
 

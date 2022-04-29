@@ -26,7 +26,7 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Projects
-        public IActionResult Index(string searchString, string sortOrder)
+        public async Task<IActionResult> Index(string searchString, string sortOrder, int pageNumber = 1)
         {
             if (IsNotLogged())
             {
@@ -80,11 +80,11 @@ namespace IssueTracker.Controllers
             var issues = _context.Issues.ToList();
             ViewData["Issues"] = issues;
 
-            return View(projects);
+            return View(await PaginatedList<Project>.CreateAsync(projects, pageNumber, 10));
         }
 
         // GET: Projects/Details
-        public IActionResult Details(int? id, int userId, ProjectDetails projectDetails)
+        public async Task<IActionResult> Details(int? id, int userId, ProjectDetails projectDetails, int pageNumber = 1)
         {
             if (IsNotLogged() || userId != HttpContext.Session.GetInt32("UserId"))
             {
@@ -101,7 +101,8 @@ namespace IssueTracker.Controllers
             projectDetails.Project = project;
             projectDetails.projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
             projectDetails.projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
-            projectDetails.issues = _context.Issues.Where(i => i.ProjectId == id).ToList();
+            var issues = _context.Issues.Where(i => i.ProjectId == id);
+            projectDetails.issues = await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 5);
             projectDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
             projectDetails.personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
             projectDetails.allUsers = _context.Persons.ToList();
@@ -248,19 +249,37 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Projects/Edit
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id, ProjectDetails projectDetails)
         {
             if (id == null)
             {
                 return RedirectToAction("Index", "Authorization");
             }
-
+            
             var project = await _context.Projects.FindAsync(id);
             if (project == null)
             {
                 return NotFound();
             }
-            return View(project);
+
+            var userId = HttpContext.Session.GetInt32("UserId") ?? -1;
+            var personProject = _context.PersonProjects.FirstOrDefault(pp => pp.PersonId == userId && pp.ProjectId == id);
+            if (personProject == null || personProject.Role != ProjectRole.Manager)
+            {
+                _notyf.Error("You cannot edit this project");
+                return RedirectToAction("Index");
+            }
+
+            projectDetails.Project = project;
+            projectDetails.projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
+            projectDetails.personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
+
+            foreach (var pp in projectDetails.personProjects)
+            {
+                pp.Person = _context.Persons.FirstOrDefault(x => x.PersonId == pp.PersonId);
+            }
+
+            return View(projectDetails);
         }
 
         // POST: Projects/Edit/5

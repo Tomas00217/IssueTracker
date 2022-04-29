@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
+using System.Linq;
 
 namespace IssueTracker.Controllers
 {
@@ -22,7 +23,7 @@ namespace IssueTracker.Controllers
             return id == null || id < 0;
         }
 
-        public IActionResult Index(string searchString, string sortOrder, string sortType)
+        public async Task<IActionResult> Index(string searchString, string sortOrder, string sortType, int pageNumber = 1, int projectId = -1)
         {
             if (IsNotLogged())
             {
@@ -30,12 +31,13 @@ namespace IssueTracker.Controllers
             }
             var userId = HttpContext.Session.GetInt32("UserId") ?? -1;
 
-            var personProjectsIds = _context?.PersonProjects?.Where(p => p.PersonId == userId).Select(p => p.ProjectId);
+            var personProjectsIds = projectId < 0 ? 
+                _context?.PersonProjects?.Where(p => p.PersonId == userId).Select(p => p.ProjectId) : 
+                _context?.PersonProjects?.Where(p => p.PersonId == userId && p.ProjectId == projectId).Select(p => p.ProjectId);
 
-            var issues = from m in _context?.Issues?
-                .Where(i => personProjectsIds.Contains(i.ProjectId))
-                .Include(i => i.Creator).Include(i => i.Project)
-                         select m;
+            var issues = from m in _context.Issues.Where(i => personProjectsIds.Contains(i.ProjectId))
+                .Include(i => i.Creator)
+                .Include(i => i.Project) select m;
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -115,7 +117,7 @@ namespace IssueTracker.Controllers
                     break;
             }
 
-            return View(issues);
+            return View(await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 10));
         }
 
         // GET
@@ -128,7 +130,7 @@ namespace IssueTracker.Controllers
 
             var userId = GetUserId();
 
-            List<Project> projects = _context.GetUserProjects(userId);
+            var projects = _context.GetUserProjects(userId);
         
             ViewData["ProjectId"] = new SelectList(projects, "ProjectId", "Name");
 

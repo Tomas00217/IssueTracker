@@ -12,17 +12,17 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="PersonId" />
-            <div class="form-group">
+            <div class="form-group m-1">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <label asp-for="SecondName" class="control-label"></label>
                 <input asp-for="SecondName" class="form-control" />
                 <span asp-validation-for="SecondName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -30,9 +30,9 @@
 </div>
 
 <div>
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete" data-bs-accId="@Model?.PersonId">Delete</button>
+    <button type="button" class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-accId="@Model?.PersonId">Delete</button>
     <partial name="_DeleteAccountModal"></partial>
-    <a asp-action="Profile">Back to List</a>
+    <a asp-action="Profile">Back</a>
 </div>
 
 @section Scripts {

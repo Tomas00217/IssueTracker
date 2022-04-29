@@ -4,17 +4,17 @@ namespace IssueTracker.Utils
 {
     public static class ContextUtils
     {
-        public static List<Project> GetUserProjects(this IssueTrackerContext context, int userId)
+        public static IQueryable<Project> GetUserProjects(this IssueTrackerContext context, int userId)
         {
             if (userId < 0)
-                return new List<Project>();
+                return Enumerable.Empty<Project>().AsQueryable();
 
             var userProjectIds = context?.PersonProjects?.Where(proj => proj.PersonId == userId).Select(proj => proj.ProjectId);
 
             if (userProjectIds?.Any() != true)
-                return new List<Project>();
+                return Enumerable.Empty<Project>().AsQueryable();
 
-            var projects = context?.Projects?.Where(proj => userProjectIds.Contains(proj.ProjectId)).ToList() ?? new List<Project>();
+            var projects = context?.Projects?.Where(proj => userProjectIds.Contains(proj.ProjectId)) ?? Enumerable.Empty<Project>().AsQueryable(); ;
 
             return projects;
         }

@@ -1,4 +1,4 @@
-﻿@model IssueTracker.Models.Project
+﻿@model IssueTracker.Models.ProjectDetails
 @using Microsoft.AspNetCore.Http;
 @inject IHttpContextAccessor httpContextAccessor;
 
@@ -21,28 +21,37 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ProjectId" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+            <input type="hidden" asp-for="Project.ProjectId" />
+            <div class="form-group m-1">
+                <label asp-for="Project.Name" class="control-label"></label>
+                <input asp-for="Project.Name" class="form-control" />
+                <span asp-validation-for="Project.Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
+            <div class="form-group m-1">
+                <label class="control-label">Project Lead</label>
+                <input name="email" class="form-control" list="datalistOptions" placeholder="@Model.projectLead">
+                <input name="projectId" value="@Model.Project.ProjectId" hidden>
+                <datalist id="datalistOptions">
+                    @foreach (var person in Model.personProjects)
+                    {
+                        if (person.Role != ProjectRole.Manager)
+                        {
+                            <option value="@person.Person.Email"/>
+                        }
+                    }
+                </datalist>
             </div>
-            <div class="form-group">
-                <label asp-for="TargetEndDate" class="control-label"></label>
-                <input asp-for="TargetEndDate" class="form-control" />
-                <span asp-validation-for="TargetEndDate" class="text-danger"></span>
+            <div class="form-group m-1">
+                <label asp-for="Project.TargetEndDate" class="control-label"></label>
+                <input asp-for="Project.TargetEndDate" class="form-control" />
+                <span asp-validation-for="Project.TargetEndDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ActualEndDate" class="control-label"></label>
-                <input asp-for="ActualEndDate" class="form-control" />
-                <span asp-validation-for="ActualEndDate" class="text-danger"></span>
+            <div class="form-group m-1">
+                <label asp-for="Project.ActualEndDate" class="control-label"></label>
+                <input asp-for="Project.ActualEndDate" class="form-control" />
+                <span asp-validation-for="Project.ActualEndDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -50,7 +59,7 @@
 </div>
 
 <div>
-    <a asp-action="Details" asp-route-id="@Model.ProjectId" asp-route-userId="@getUserId()">Back to Details</a>
+    <a asp-action="Details" asp-route-id="@Model.Project.ProjectId" asp-route-userId="@getUserId()">Back to Details</a>
 </div>
 
 @section Scripts {

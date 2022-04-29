@@ -108,15 +108,15 @@
 </div>
 <div>
     <partial name="_UserList" model="Model"/>
-    <partial name="_IssueList" model="Model.issues"/>
+    <partial name="_IssueList" model="Model"/>
 </div>
 <div class="float-end">
     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
         Show Users
     </button>
-    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIssues" aria-expanded="false" aria-controls="collapseIssues">
+    <a class="btn btn-primary" asp-controller="Issues" asp-action="Index" asp-route-projectId="@Model.Project.ProjectId">
         Show Issues
-    </button>
+    </a>
     
 </div>
 
@@ -124,5 +124,7 @@
 @if (Model.userRole == ProjectRole.Manager || getUserId() == 1)
 {
     <p><a asp-action="Edit" asp-route-id="@Model.Project.ProjectId">Edit</a></p>
+    
 }
+
 <p><a asp-action="Index">Back to List</a></p>
