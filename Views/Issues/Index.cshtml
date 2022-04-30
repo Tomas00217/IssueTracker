@@ -1,9 +1,25 @@
 ﻿@model PaginatedList<IssueTracker.Models.Issue>
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
 
 @{
     ViewData["Title"] = "Issues";
     var prevDisabled = !Model.PreviousPage ? "disabled" : "";
     var nextDisabled = !Model.NextPage ? "disabled" : "";    
+}
+
+@functions {
+
+    public int getUserId()
+    {
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
+    }
+    
+    public Boolean canDelete(int creatorId, int assigneeId)
+    {
+        int userId = getUserId();
+        return userId == 1 || userId == creatorId || userId == assigneeId;
+    }
 }
 
 <a class="h1 text-decoration-none" asp-action="Index">@ViewData["Title"]</a>
@@ -133,8 +149,16 @@
                 @Html.DisplayFor(modelItem => item.Creator.Email)
             </td>
             <td class="text-end">
-                <a class="btn-primary btn" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                | <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a class="btn-primary btn" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                @if (canDelete(item.CreatorId, item.AsigneeId))
+                {
+                    <button type="button" class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-issueName="@item.Summary" data-bs-issueId="@item.Id">Delete</button>
+                }
+                else
+                {
+                    <span type="button" class="btn btn-danger m-1 opacity-50 disabled">Delete</span>
+                }
+                <partial name="_DeleteIssueModal"></partial>
             </td>
         </tr>
 }
@@ -158,3 +182,19 @@
     </div>
 
 </div>
+
+<script>
+    var exampleModal = document.getElementById('delete')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget
+
+    var id = button.getAttribute('data-bs-issueId')
+    var name = button.getAttribute('data-bs-issueName')
+
+    var modalBodyInput = exampleModal.querySelector('.iss input')
+    var modalBodyParagraph = exampleModal.querySelector('.iss p')
+    
+    modalBodyParagraph.innerHTML = "Are you sure you want to delete issue: " + name + "?"
+    modalBodyInput.value = id
+    })
+</script>

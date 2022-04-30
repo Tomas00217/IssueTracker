@@ -1,4 +1,5 @@
-﻿using IssueTracker.Models;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using IssueTracker.Models;
 using IssueTracker.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,9 +12,11 @@ namespace IssueTracker.Controllers
     public class IssuesController : Controller
     {
         private readonly IssueTrackerContext _context;
+        private readonly INotyfService _notyf;
 
-        public IssuesController(IssueTrackerContext context)
+        public IssuesController(IssueTrackerContext context, INotyfService notyf)
         {
+            _notyf = notyf;
             _context = context;
         }
         private Boolean IsNotLogged()
@@ -117,7 +120,7 @@ namespace IssueTracker.Controllers
                     break;
             }
 
-            return View(await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 10));
+            return View(await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 8));
         }
 
         // GET
@@ -159,6 +162,19 @@ namespace IssueTracker.Controllers
             _context?.SaveChanges();
 
             return RedirectToAction("Index");
+        }
+
+        // POST: Issues
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            var issue = _context.Issues.Find(id);
+            _context.Issues.Remove(issue);
+            _context.SaveChanges();
+
+            _notyf.Success("Issue sucessfuly deleted");
+            return RedirectToAction(nameof(Index));
         }
 
         private int GetUserId()

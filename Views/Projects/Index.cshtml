@@ -25,6 +25,12 @@
     {
         return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
     }
+
+    public Boolean canDelete(int projId)
+    {
+        var ppIds = ViewBag.CurrUserPP;
+        return getUserId() == 1 || ppIds.Contains(projId);
+    }
 }
 
 <a class="h1 text-decoration-none" asp-action="Index">@ViewData["Title"]</a>
@@ -133,7 +139,11 @@
             </td>
             <td class="text-end">
                 <a type="button" class="btn btn-primary" asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a> |
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
+                @if (canDelete(item.ProjectId)) {
+                    <button type="button" class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
+                } else {
+                    <span type="button" class="btn btn-danger m-1 opacity-50 disabled">Delete</span>
+                }
                 <partial name="_DeleteProjectModal"></partial>
             </td>
         </tr> 

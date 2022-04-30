@@ -80,7 +80,10 @@ namespace IssueTracker.Controllers
             var issues = _context.Issues.ToList();
             ViewData["Issues"] = issues;
 
-            return View(await PaginatedList<Project>.CreateAsync(projects, pageNumber, 10));
+            var currUserPP = _context.PersonProjects.Where(pp => pp.PersonId == userId && pp.Role == ProjectRole.Manager).Select(pp => pp.ProjectId).ToList();
+            ViewData["CurrUserPP"] = currUserPP;
+
+            return View(await PaginatedList<Project>.CreateAsync(projects, pageNumber, 8));
         }
 
         // GET: Projects/Details
@@ -350,7 +353,7 @@ namespace IssueTracker.Controllers
             return View(projectToUpdate);
         }
 
-        // POST: Projects/Delete
+        // POST: Projects
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)

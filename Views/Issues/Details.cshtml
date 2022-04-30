@@ -1,0 +1,18 @@
+﻿@model IssueTracker.Models.Issue
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
+
+@functions {
+    public int getUserId()
+    {
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
+    }
+}
+
+@if (Model.AsigneeId == getUserId() || Model.CreatorId == getUserId() || getUserId() == 1)
+{
+    <p><a asp-action="Edit" asp-route-id="@Model.Project.ProjectId">Edit</a></p>
+    
+}
+
+<p><a asp-action="Index">Back to List</a></p>
