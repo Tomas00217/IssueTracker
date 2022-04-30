@@ -28,23 +28,17 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Project</h4>
+    <h4>@Html.DisplayFor(model => model.Project.Name)</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Project.Name)
+            People working on this project:
         </dt>
         <dd class = "col-sm-7">
-            @Html.DisplayFor(model => model.Project.Name)
+            @getPeopleCount(@Model.Project.ProjectId)
         </dd>
         <dd class = "col-sm-2">
             <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
-        </dd>
-        <dt class = "col-sm-3">
-            People working on this project:
-        </dt>
-        <dd class = "col-sm-9">
-            @getPeopleCount(@Model.Project.ProjectId)
         </dd>
         <dt class = "col-sm-3">
             Project Lead:
@@ -65,6 +59,13 @@
                     Set Project Lead
                 </button>
                 <partial name="_SetProjectLeadModal"/>
+            }
+            else if (@Model.userRole == ProjectRole.Manager && Model.projectLead != null)
+            {
+                <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#projectLead">
+                    Change Project Lead
+                </button>
+                <partial name="_SetProjectLeadModal" />
             }
         </dd>
         <dt class = "col-sm-3">
@@ -106,18 +107,13 @@
         </dd>
     </dl>
 </div>
-<div>
-    <partial name="_UserList" model="Model"/>
-    <partial name="_IssueList" model="Model"/>
-</div>
 <div class="float-end">
-    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
+    <a class="btn btn-primary" asp-action="UserList" asp-route-projectId="@Model.Project.ProjectId">
         Show Users
-    </button>
+    </a>
     <a class="btn btn-primary" asp-controller="Issues" asp-action="Index" asp-route-projectId="@Model.Project.ProjectId">
         Show Issues
     </a>
-    
 </div>
 
 <partial name="_AddToProjectModal"/>

@@ -104,7 +104,8 @@ namespace IssueTracker.Controllers
             var issues = _context.Issues.Where(i => i.ProjectId == id);
             projectDetails.issues = await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 5);
             projectDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
-            projectDetails.personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
+            var personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
+            projectDetails.personProjects = await PaginatedList<PersonProject>.CreateAsync(personProjects, pageNumber, 10);
             projectDetails.allUsers = _context.Persons.ToList();
 
             return View(projectDetails);
@@ -161,7 +162,15 @@ namespace IssueTracker.Controllers
                 return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
             }
 
-            var personProject = _context.PersonProjects.FirstOrDefault(pp => pp.Person.Email == email && pp.ProjectId == projectId);
+            var personProject = _context.PersonProjects.FirstOrDefault(pp => pp.Role == ProjectRole.ProjectLead && pp.ProjectId == projectId);
+            
+            if (personProject != null)
+            {
+                personProject.Role = ProjectRole.Developer;
+                _context.SaveChanges();
+            }
+
+            personProject = _context.PersonProjects.FirstOrDefault(pp => pp.Person.Email == email && pp.ProjectId == projectId);
 
             if (personProject == null)
             {
@@ -185,28 +194,56 @@ namespace IssueTracker.Controllers
             if (currentRole == ProjectRole.Developer)
             {
                 _notyf.Error("Invalid action");
-                return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
+                return RedirectToAction("UserList", new { projectId = personProject.ProjectId});
             }
             
             if (personProject == null)
             {
                 _notyf.Error("User is not part of project");
-                return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
+                return RedirectToAction("UserList", new { projectId = personProject.ProjectId});
             } 
             
             if (personProject.Role == ProjectRole.Manager && currentRole != ProjectRole.Manager)
             {
                 _notyf.Error("Only manager can remove manager");
-                return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
+                return RedirectToAction("UserList", new { projectId = personProject.ProjectId});
             }
             
             _context.PersonProjects.Remove(personProject);
             _context.SaveChanges();
 
             _notyf.Success("User sucessfuly removed from project");
-            return RedirectToAction("Details", new { id = personProject.ProjectId, userId = currentUserId });
+            return RedirectToAction("UserList", new { projectId = personProject.ProjectId});
         }
 
+        public async Task<IActionResult> UserList(int projectId, ProjectDetails projectDetails, int pageNumber = 1)
+        {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+            var project = _context.Projects
+                .FirstOrDefault(m => m.ProjectId == projectId);
+            if (project == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            int userId = HttpContext.Session.GetInt32("UserId") ?? -1;
+
+            projectDetails.Project = project;
+            var personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == projectId);
+            projectDetails.personProjects = await PaginatedList<PersonProject>.CreateAsync(personProjects, pageNumber, 10);
+            projectDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == projectId && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
+
+            foreach (var pp in projectDetails.personProjects)
+            {
+                pp.Person = _context.Persons.FirstOrDefault(pers => pers.PersonId == pp.PersonId);
+            }
+
+            return View(projectDetails);
+        }
+             
         // GET: Projects/Create
         public IActionResult Create()
         {
@@ -249,7 +286,7 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Projects/Edit
-        public async Task<IActionResult> Edit(int? id, ProjectDetails projectDetails)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -270,39 +307,38 @@ namespace IssueTracker.Controllers
                 return RedirectToAction("Index");
             }
 
-            projectDetails.Project = project;
-            projectDetails.projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
-            projectDetails.personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
-
-            foreach (var pp in projectDetails.personProjects)
-            {
-                pp.Person = _context.Persons.FirstOrDefault(x => x.PersonId == pp.PersonId);
-            }
-
-            return View(projectDetails);
+            return View(project);
         }
 
-        // POST: Projects/Edit/5
+        // POST: Projects/Edit
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(int? id)
+        public async Task<IActionResult> EditPost(int? id, string email)
         {
             if (id == null)
             {
-                return RedirectToAction("Index", "Authorization");
+                _notyf.Error("Project does not exist");
+                return RedirectToAction("Index");
             }
             var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
             
-        /*  if (await TryUpdateModelAsync<Project>(
+            if (projectToUpdate == null)
+            {
+                _notyf.Error("Project does not exist");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (await TryUpdateModelAsync<Project>(
                 projectToUpdate,
                 "",
-                p => p.Name, p => p.StartDate, p => p.TargetEndDate, p => p.ActualEndDate, p => p.ModifiedBy))
+                p => p.Name, p => p.StartDate, p => p.TargetEndDate, p => p.ActualEndDate))
             {
 
                 try
                 {
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    _notyf.Success("Project sucessfuly edited");
+                    return RedirectToAction("Details", new { id = id, userId = HttpContext.Session.GetInt32("UserId") ?? -1 });
                 }
                 catch (DbUpdateException )
                 {
@@ -310,7 +346,7 @@ namespace IssueTracker.Controllers
                         "Try again, and if the problem persists, " +
                         "see your system administrator.");
                 }
-            }*/
+            }
             return View(projectToUpdate);
         }
 

@@ -27,8 +27,8 @@
     }
 }
 
-<h4>@ViewData["Title"]</h4>
-
+<a class="h1 text-decoration-none" asp-action="Index">@ViewData["Title"]</a>
+<hr/>
 <form asp-controller="Projects" asp-action="Index" method="get">
     <p>
         Name: <input type="text" name="SearchString" />
@@ -131,7 +131,7 @@
                     <p>Done</p>
                 }
             </td>
-            <td>
+            <td class="text-end">
                 <a type="button" class="btn btn-primary" asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a> |
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
                 <partial name="_DeleteProjectModal"></partial>
@@ -141,17 +141,23 @@
     </tbody>
 </table>
 
-<a class="btn btn-primary m-1" asp-action="Create">
-    Create new project
-</a>
+<div>
+    <a class="btn btn-primary m-1" asp-action="Create">
+        Create new project
+    </a>
 
-<a class ="btn-primary btn m-1 float-end @prevDisabled" asp-action="Index" asp-route-PageNumber="@(Model.PageIndex - 1)">
-    Previous
-</a>
+    <div class="float-end">
+        <a class ="btn-primary btn m-1 @prevDisabled" asp-action="Index" asp-route-PageNumber="@(Model.PageIndex - 1)">
+            Previous
+        </a>
+        | @(Model.PageIndex) | 
+        <a class = "btn-primary btn m-1 @nextDisabled" asp-action="Index" asp-route-PageNumber="@(Model.PageIndex + 1)">
+            Next
+        </a> 
+    </div>
 
-<a class = "btn-primary btn m-1 float-end @nextDisabled" asp-action="Index" asp-route-PageNumber="@(Model.PageIndex + 1)">
-    Next
-</a>
+</div>
+
 
 <script>
     var exampleModal = document.getElementById('delete')

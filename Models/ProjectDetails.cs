@@ -15,7 +15,7 @@ namespace IssueTracker.Models
 
         public ProjectRole userRole;
 
-        public IQueryable<PersonProject> personProjects;
+        public PaginatedList<PersonProject> personProjects;
 
         public List<Person> allUsers;
     }

@@ -1,0 +1,72 @@
+﻿@model IssueTracker.Models.ProjectDetails;
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
+
+<style>
+    td {
+        vertical-align: middle!important;
+    }
+</style>
+
+@functions {
+    public int getUserId()
+    {
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
+    }
+}
+
+@{
+    var prevDisabled = !Model.personProjects.PreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.personProjects.NextPage ? "disabled" : "";   
+}
+
+<h1>Users</h1>
+<h4>@Html.DisplayFor(model => model.Project.Name)</h4>
+<hr/>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th class="text-end"><span class="m-1">Action</span></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pp in Model.personProjects)
+        {
+            <tr>
+            <td>@pp.Person?.FirstName @pp.Person?.SecondName</td>
+            <td>@pp.Person?.Email</td>
+            <td>@pp.Role</td>
+            <td class="text-end">
+            @if (Model.userRole != ProjectRole.Developer)
+            {
+                if (Model.userRole == ProjectRole.ProjectLead && pp.Role == ProjectRole.Manager && (@httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1) != 1)
+                {
+                <span type="button" class="btn btn-danger m-1 opacity-50 disabled">Remove</span>
+                } else
+                {
+                <a type="button" class="btn btn-danger m-1" asp-action="RemoveFromProject" asp-route-userId="@pp.PersonId" asp-route-currentRole="@Model.userRole">
+                    Remove
+                </a> 
+                }
+            }
+            </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Details" asp-route-id="@Model.Project.ProjectId" asp-route-userId="@getUserId()">Back to Details</a>
+    <div class="float-end">
+        <a class ="btn-primary btn m-1 @prevDisabled" asp-action="UserList" asp-route-projectId="@Model.Project.ProjectId" asp-route-PageNumber="@(Model.personProjects.PageIndex - 1)">
+            Previous
+        </a>
+        | @(Model.personProjects.PageIndex) | 
+        <a class = "btn-primary btn m-1 @nextDisabled" asp-action="UserList" asp-route-projectId="@Model.Project.ProjectId" asp-route-PageNumber="@(Model.personProjects.PageIndex + 1)">
+            Next
+        </a> 
+    </div>
+</div
