@@ -28,34 +28,36 @@
     <form class="d-inline" asp-controller="Issues" asp-action="Index" method="get">
         <div class="d-inline">
             Summary: <input type="text" name="SearchString" />
-            <input type="submit" class="btn btn-primary" value="Filter"/>
+            <input type="submit" class="btn btn-link text-decoration-none" value="Filter"/>
         </div>
     </form>
     <div class="d-inline">
-        <a class="btn btn-primary" asp-action="Index" asp-route-sortType="@ViewData["MyIssues"]">My issues</a>
+        <a class="btn btn-link text-decoration-none" asp-action="Index" asp-route-sortType="@ViewData["MyIssues"]">My issues</a>
     </div>
     <div class="dropdown d-inline">
-      <button class="btn btn-primary dropdown-toggle" type="button" id="StateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      <button class="btn btn-link text-decoration-none dropdown-toggle" type="button" id="StateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         State
       </button>
       <ul class="dropdown-menu" aria-labelledby="StateDropdown">
-        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateNew"]">New</a></li>
-        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateActive"]">Active</a></li>
-        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateResolved"]">Resolved</a></li>
-        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["StateClosed"]">Closed</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["State"]" asp-route-state="@IssueStatus.New">New</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["State"]" asp-route-state="@IssueStatus.Active">Active</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["State"]" asp-route-state="@IssueStatus.Resolved">Resolved</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["State"]" asp-route-state="@IssueStatus.Closed">Closed</a></li>
       </ul>
     </div>    
     <div class="dropdown d-inline">
-      <button class="btn btn-primary dropdown-toggle" type="button" id="PriorityDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      <button class="btn btn-link text-decoration-none dropdown-toggle" type="button" id="PriorityDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         Priority
       </button>
       <ul class="dropdown-menu" aria-labelledby="PriorityDropdown">
-        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["PriorityHigh"]">High</a></li>
-        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["PriorityMedium"]">Medium</a></li>
-        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["PriorityLow"]">Low</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["Priority"]" asp-route-priority="@IssuePriority.High">High</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["Priority"]" asp-route-priority="@IssuePriority.Medium">Medium</a></li>
+        <li><a class="dropdown-item" asp-action="Index" asp-route-sortType="@ViewData["Priority"]" asp-route-priority="@IssuePriority.Low">Low</a></li>
       </ul>
     </div> 
 </div>
+
+
 
 <table class="table">
     <thead>
@@ -116,7 +118,7 @@
                 Date due
             </th>
             <th>
-                Asignee
+                Assignee
             </th>
             <th>
                 Creator
@@ -127,29 +129,33 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
+            <td class="text-break">
                 @Html.DisplayFor(modelItem => item.Summary)
             </td>
-            <td>
+            <td class="text-break">
                 @Html.DisplayFor(modelItem => item.Project.Name)
             </td>
-            <td>
+            <td class="text-break">
                 @Html.DisplayFor(modelItem => item.State)
             </td>
-            <td>
+            <td class="text-break">
                 @Html.DisplayFor(modelItem => item.Priority)
             </td>
-            <td>
+            <td class="text-break">
                 @Html.DisplayFor(modelItem => item.TargetResolutionDate)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Asignee.Email)
+            <td class="text-break">
+            @if (item.Asignee != null)
+            {
+                <span>@item.Asignee.Email</span>
+            }
+
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Creator.Email)
+            <td class="text-break">
+                @item.Creator.Email
             </td>
             <td class="text-end">
-                <a class="btn-primary btn" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a class="btn-primary btn m-1" asp-action="Details" asp-route-id="@item.Id">Details</a>
                 @if (canDelete(item.CreatorId, item.AsigneeId))
                 {
                     <button type="button" class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-issueName="@item.Summary" data-bs-issueId="@item.Id">Delete</button>

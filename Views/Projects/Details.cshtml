@@ -31,22 +31,16 @@
     <h4>@Html.DisplayFor(model => model.Project.Name)</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-3">
-            People working on this project:
-        </dt>
-        <dd class = "col-sm-7">
-            @getPeopleCount(@Model.Project.ProjectId)
-        </dd>
+        <dt class = "col-sm-3">People working on this project:</dt>
+        <dd class = "col-sm-7">@getPeopleCount(@Model.Project.ProjectId)</dd>
         <dd class = "col-sm-2">
             <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
         </dd>
-        <dt class = "col-sm-3">
-            Project Lead:
-        </dt>
+        <dt class = "col-sm-3">Project Lead:</dt>
         <dd class = "col-sm-7">
             @if (Model.projectLead == null)
             {
-                <p> Project does not have a project lead </p>
+                <span> Project does not have a project lead </span>
             } else
             {
                 @Model.projectLead
@@ -68,27 +62,13 @@
                 <partial name="_SetProjectLeadModal" />
             }
         </dd>
-        <dt class = "col-sm-3">
-            Number of issues:
-        </dt>
-        <dd class = "col-sm-9">
-            @getIssueCount(@Model.Project.ProjectId)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Project.StartDate)
-        </dt>
-        <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.Project.StartDate)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Project.TargetEndDate)
-        </dt>
-        <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.Project.TargetEndDate)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Project.ActualEndDate)
-        </dt>
+        <dt class = "col-sm-3">Number of issues:</dt>
+        <dd class = "col-sm-9">@getIssueCount(@Model.Project.ProjectId)</dd>
+        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.StartDate):</dt>
+        <dd class = "col-sm-9">@Html.DisplayFor(model => model.Project.StartDate)</dd>
+        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.TargetEndDate):</dt>
+        <dd class = "col-sm-9">@Html.DisplayFor(model => model.Project.TargetEndDate)</dd>
+        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.ActualEndDate):</dt>
         <dd class = "col-sm-9">
             @if (Model.Project.ActualEndDate.CompareTo(DateTime.MinValue) == 0)
             {
@@ -99,12 +79,8 @@
                 @Html.DisplayFor(model => model.Project.ActualEndDate)
             }
         </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Project.CreatedOn)
-        </dt>
-        <dd class = "col-sm-9">
-            @Html.DisplayFor(model => model.Project.CreatedOn)
-        </dd>
+        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.CreatedOn):</dt>
+        <dd class = "col-sm-9">@Html.DisplayFor(model => model.Project.CreatedOn)</dd>
     </dl>
 </div>
 <div class="float-end">
@@ -120,7 +96,6 @@
 @if (Model.userRole == ProjectRole.Manager || getUserId() == 1)
 {
     <p><a asp-action="Edit" asp-route-id="@Model.Project.ProjectId">Edit</a></p>
-    
 }
 
 <p><a asp-action="Index">Back to List</a></p>

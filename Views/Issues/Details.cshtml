@@ -1,4 +1,4 @@
-﻿@model IssueTracker.Models.Issue
+﻿@model IssueTracker.Models.IssueDetails
 @using Microsoft.AspNetCore.Http;
 @inject IHttpContextAccessor httpContextAccessor;
 
@@ -9,10 +9,71 @@
     }
 }
 
-@if (Model.AsigneeId == getUserId() || Model.CreatorId == getUserId() || getUserId() == 1)
+<h1>Details</h1>
+<h4>@Html.DisplayFor(model => model.issue.Summary)</h4>
+<hr />
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.Creator):</dt>
+        <dd class="col-sm-7">@Html.DisplayFor(model => model.issue.Creator.Email)</dd>
+        <dd class="col-sm-3 text-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignee">Assign</button>
+            <partial name="_AssignToIssueModal" />
+        </dd>
+        <dt class="col-sm-2">Assignee:</dt>
+        <dd class="col-sm-7">
+            @if (Model.issue.Asignee != null)
+            {
+                @Html.DisplayFor(model => model.issue.Asignee.Email)
+            } else
+            {
+                <span>Nobody has been assigned yet</span>
+            }
+            
+        </dd>
+        <dd class="col-sm-3 text-end">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="StateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Mark as
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="StateDropdown">
+                <li><a class="dropdown-item" asp-action="MarkAs" asp-route-id="@Model.issue.Id" asp-route-state="@IssueStatus.New">New</a></li>
+                <li><a class="dropdown-item" asp-action="MarkAs" asp-route-id="@Model.issue.Id" asp-route-state="@IssueStatus.Active">Active</a></li>
+                <li><a class="dropdown-item" asp-action="MarkAs" asp-route-id="@Model.issue.Id" asp-route-state="@IssueStatus.Resolved">Resolved</a></li>
+                <li><a class="dropdown-item" asp-action="MarkAs" asp-route-id="@Model.issue.Id" asp-route-state="@IssueStatus.Closed">Closed</a></li>
+              </ul>
+            </div> 
+        </dd>
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.State):</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.State)</dd>
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.Priority):</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.Priority)</dd>
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.TargetResolutionDate):</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.TargetResolutionDate)</dd>
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.ActualResolutionDate):</dt>
+        <dd class="col-sm-9">
+            @if (Model.issue.ActualResolutionDate.CompareTo(DateTime.MinValue) != 0)
+            {
+                @Html.DisplayFor(model => model.issue.ActualResolutionDate)
+            } else
+            {
+                <span>Not yet resolved</span>
+            }
+        </dd>
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.CreatedOn):</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.CreatedOn)</dd>
+    </dl>
+    <hr />
+    <div>
+    <h6 class="fw-bold">@Html.DisplayNameFor(model => model.issue.Description):</h6>
+    <p>@Html.DisplayFor(model => model.issue.Description)</p>
+    </div>
+    
+</div>
+
+@if (Model.issue.AsigneeId == getUserId() || Model.issue.CreatorId == getUserId() || getUserId() == 1)
 {
-    <p><a asp-action="Edit" asp-route-id="@Model.Project.ProjectId">Edit</a></p>
+    <p><a asp-action="Edit" asp-route-id="@Model.issue.Id">Edit</a></p>
     
 }
-
 <p><a asp-action="Index">Back to List</a></p>

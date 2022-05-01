@@ -1,19 +1,19 @@
 ﻿<!-- Modal -->
-<div class="modal fade" id="projectLead" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="assignee" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="projectLead">Set project lead</h5>
+        <h5 class="modal-title" id="projectLead">Assign to issue</h5>
         <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <form asp-action="SetProjectLead">
+        <form asp-action="AssignPerson">
             <div class="form-group text-start">
                 <label class="control-label">Pick User</label>
                 <input name="email" class="form-control" list="datalistOptions" placeholder="Type to search...">
-                <input name="projectId" value="@Model.Project.ProjectId" hidden>
+                <input name="id" value="@Model.issue.Id" hidden>
                 <datalist id="datalistOptions">
                     @foreach (var person in Model.personProjects)
                     {
@@ -26,8 +26,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary" asp-action="AssignPerson" asp-route-email="@Model.currentUser.Email" asp-route-id="@Model.issue.Id">Assign self</a>
                 <div class="form-group">
-                    <input type="submit" value="Set Project Lead" class="btn btn-primary" />
+                    <input type="submit" value="Assign" class="btn btn-primary"/>
                 </div>
             </div>
         </form>

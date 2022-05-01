@@ -38,7 +38,7 @@
 <form asp-controller="Projects" asp-action="Index" method="get">
     <p>
         Name: <input type="text" name="SearchString" />
-        <input type="submit" class="btn btn-primary" value="Filter"/>
+        <input type="submit" class="btn btn-link text-decoration-none" value="Filter"/>
     </p>
 </form>
 
@@ -64,7 +64,7 @@
                 Issues
             </th>
             <th>
-                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["StartDateSort"]">StartDate
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["StartDateSort"]">Start
                     @if (@ViewData["StartDateSort"] == "StartDateDesc")
                     {
                         <i class="fa fa-arrow-down"></i>
@@ -76,7 +76,7 @@
                 </a>
             </th>
             <th>
-                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["TargetDateSort"]">EndDate 
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewData["TargetDateSort"]">End
                     @if (@ViewData["TargetDateSort"] == "TargetDateDesc")
                     {
                         <i class="fa fa-arrow-down"></i>
@@ -138,7 +138,7 @@
                 }
             </td>
             <td class="text-end">
-                <a type="button" class="btn btn-primary" asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a> |
+                <a type="button" class="btn btn-primary" asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a>
                 @if (canDelete(item.ProjectId)) {
                     <button type="button" class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
                 } else {

@@ -293,13 +293,20 @@ namespace IssueTracker.Controllers
         {
             if (id == null)
             {
+                _notyf.Error("Invalid action");
+                return RedirectToAction("Index");
+            }
+
+            if (IsNotLogged())
+            {
                 return RedirectToAction("Index", "Authorization");
             }
             
             var project = await _context.Projects.FindAsync(id);
             if (project == null)
             {
-                return NotFound();
+                _notyf.Error("Project does not exist");
+                return RedirectToAction("Index");
             }
 
             var userId = HttpContext.Session.GetInt32("UserId") ?? -1;
@@ -316,7 +323,7 @@ namespace IssueTracker.Controllers
         // POST: Projects/Edit
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(int? id, string email)
+        public async Task<IActionResult> EditPost(int? id)
         {
             if (id == null)
             {
