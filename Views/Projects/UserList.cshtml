@@ -2,12 +2,6 @@
 @using Microsoft.AspNetCore.Http;
 @inject IHttpContextAccessor httpContextAccessor;
 
-<style>
-    td {
-        vertical-align: middle!important;
-    }
-</style>
-
 @functions {
     public int getUserId()
     {
@@ -23,7 +17,7 @@
 <h1>Users</h1>
 <h4>@Html.DisplayFor(model => model.Project.Name)</h4>
 <hr/>
-<table class="table">
+<table class="table align-middle">
     <thead>
         <tr>
             <th>Name</th>
@@ -69,4 +63,4 @@
             Next
         </a> 
     </div>
-</div
+</div>

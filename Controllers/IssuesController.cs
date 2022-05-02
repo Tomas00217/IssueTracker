@@ -4,8 +4,7 @@ using IssueTracker.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace IssueTracker.Controllers
 {
@@ -26,7 +25,8 @@ namespace IssueTracker.Controllers
             return id == null || id < 0;
         }
 
-        public async Task<IActionResult> Index(string searchString, string sortOrder, string sortType, IssueStatus state, IssuePriority priority, int pageNumber = 1, int projectId = -1)
+        public async Task<IActionResult> Index(string searchString, string sortOrder, string sortType, 
+            IssueStatus state, IssuePriority priority, int pageNumber = 1, int projectId = -1)
         {
             if (IsNotLogged())
             {
@@ -52,7 +52,7 @@ namespace IssueTracker.Controllers
             
             if (!string.IsNullOrEmpty(searchString))
             {
-                issues = issues.Where(i => i.Summary.Contains(searchString));
+                issues = issues.Where(i => i.Summary.ToLower().Contains(searchString.ToLower()));
             }
 
             ViewData["SummarySort"] = String.IsNullOrEmpty(sortOrder) ? "SummaryDesc" : "";
@@ -60,53 +60,13 @@ namespace IssueTracker.Controllers
             ViewData["StateSort"] = sortOrder == "StateSort" ? "StateDesc" : "StateSort";
             ViewData["PrioritySort"] = sortOrder == "PrioritySort" ? "PriorityDesc" : "PrioritySort";
 
-            switch (sortOrder)
-            {
-                case "SummaryDesc":
-                    issues = issues.OrderByDescending(i => i.Summary);
-                    break;
-                case "ProjectSort":
-                    issues = issues.OrderBy(i => i.Project.Name);
-                    break;
-                case "ProjectDesc":
-                    issues = issues.OrderByDescending(i => i.Project.Name);
-                    break;
-                case "StateSort":
-                    issues = issues.OrderBy(i => i.State);
-                    break;
-                case "StateDesc":
-                    issues = issues.OrderByDescending(i => i.State);
-                    break;
-                case "PrioritySort":
-                    issues = issues.OrderBy(i => i.Priority);
-                    break;
-                case "PriorityDesc":
-                    issues = issues.OrderByDescending(i => i.Priority);
-                    break;
-                default:
-                    issues = issues.OrderBy(i => i.Summary);
-                    break;
-            }
+            issues = Utils.Issues.IssueSorts.sortByOrder(issues, sortOrder);
 
             ViewData["MyIssues"] = String.IsNullOrEmpty(sortType) ? "MyIssues" : "";
             ViewData["Priority"] = sortType != "Priority" ? "Priority" : "Priority";
             ViewData["State"] = sortType != "State" ? "State" : "State";
 
-            switch (sortType)
-            {
-                case "MyIssues":
-                    issues = issues.Where(i => i.AsigneeId == userId || i.CreatorId == userId);
-                    break;
-                case "Priority":
-                    issues = issues.Where(i => i.Priority == priority);
-                    break;
-                case "State":
-                    issues = issues.Where(i => i.State == state);
-                    break;
-                default:
-                    issues = issues.OrderBy(i => i.Summary);
-                    break;
-            }
+            issues = Utils.Issues.IssueSorts.sortByType(issues, sortType, state, priority, userId);
 
             return View(await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 8));
         }
@@ -274,15 +234,50 @@ namespace IssueTracker.Controllers
                 return RedirectToAction("Index");
             }
 
+            ViewBag.MyStatesEnum = ConvertToEnum("states");
+            ViewBag.MyPrioritiesEnum = ConvertToEnum("priority");
+
             return View(issue);
         }
 
         // POST: Issue/Edit
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditPost(int? id)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                _notyf.Error("Issue does not exist");
+                return RedirectToAction(nameof(Index));
+            }
+            var issue = await _context.Issues.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (issue == null)
+            {
+                _notyf.Error("Issue does not exist");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (await TryUpdateModelAsync<Issue>(
+                issue,
+                "",
+                i => i.Summary, i => i.State, i => i.Priority, i => i.TargetResolutionDate, i => i.ActualResolutionDate, i => i.Description))
+            {
+                
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    _notyf.Success("Issue sucessfuly edited");
+                    return RedirectToAction("Details", new {id = issue.Id});
+                }
+                catch (DbUpdateException)
+                {
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
+                }
+            }
+            return View(issue);
         }
 
         // POST: Issues
@@ -296,6 +291,31 @@ namespace IssueTracker.Controllers
 
             _notyf.Success("Issue sucessfuly deleted");
             return RedirectToAction(nameof(Index));
+        }
+
+        private List<ConvertEnum> ConvertToEnum(string type)
+        {
+            var myStates = new List<ConvertEnum>();
+            
+            if (type == "priority")
+            {
+                foreach (IssuePriority lang in Enum.GetValues(typeof(IssuePriority)))
+                    myStates.Add(new ConvertEnum
+                    {
+                        Value = (int)lang,
+                        Text = lang.ToString()
+                    });
+            } else
+            {
+                foreach (IssueStatus lang in Enum.GetValues(typeof(IssueStatus)))
+                    myStates.Add(new ConvertEnum
+                    {
+                        Value = (int)lang,
+                        Text = lang.ToString()
+                    });
+            }
+            
+            return myStates;
         }
 
         private int GetUserId()

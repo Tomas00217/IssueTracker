@@ -38,7 +38,7 @@ namespace IssueTracker.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                projects = projects.Where(p => p.Name.Contains(searchString));
+                projects = projects.Where(p => p.Name.ToLower().Contains(searchString.ToLower()));
             }
 
             ViewData["NameSort"] = String.IsNullOrEmpty(sortOrder) ? "NameDesc" : "";
@@ -46,33 +46,7 @@ namespace IssueTracker.Controllers
             ViewData["TargetDateSort"] = sortOrder == "TargetDate" ? "TargetDateDesc" : "TargetDate";
             ViewData["StatusSort"] = sortOrder == "Status" ? "StatusDesc" : "Status";
 
-            switch (sortOrder)
-            {
-                case "NameDesc":
-                    projects = projects.OrderByDescending(p => p.Name);
-                    break;
-                case "StartDate":
-                    projects = projects.OrderBy(p => p.StartDate);
-                    break;
-                case "StartDateDesc":
-                    projects = projects.OrderByDescending(p => p.StartDate);
-                    break;
-                case "TargetDate":
-                    projects = projects.OrderBy(p => p.TargetEndDate);
-                    break;
-                case "TargetDateDesc":
-                    projects = projects.OrderByDescending(p => p.TargetEndDate);
-                    break;
-                case "Status":
-                    projects = projects.OrderBy(p => p.TargetEndDate);
-                    break;
-                case "StatusDesc":
-                    projects = projects.OrderByDescending(p => p.TargetEndDate);
-                    break;
-                default:
-                    projects = projects.OrderBy(p => p.Name);
-                    break;
-            }
+            projects = Utils.Projects.ProjectSorts.sortByOrder(projects, sortOrder);
 
             var projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
             ViewData["ProjectIds"] = projectIds;

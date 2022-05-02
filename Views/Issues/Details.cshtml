@@ -9,12 +9,12 @@
     }
 }
 
-<h1>Details</h1>
+<h1 style="color: #1c9954!important">Details</h1>
 <h4>@Html.DisplayFor(model => model.issue.Summary)</h4>
 <hr />
 <div>
     <dl class="row">
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.Creator):</dt>
+        <dt class="col-sm-2">Creator:</dt>
         <dd class="col-sm-7">@Html.DisplayFor(model => model.issue.Creator.Email)</dd>
         <dd class="col-sm-3 text-end">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignee">Assign</button>
@@ -44,13 +44,13 @@
               </ul>
             </div> 
         </dd>
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.State):</dt>
+        <dt class="col-sm-2">State:</dt>
         <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.State)</dd>
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.Priority):</dt>
+        <dt class="col-sm-2">Priority:</dt>
         <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.Priority)</dd>
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.TargetResolutionDate):</dt>
+        <dt class="col-sm-2">Target resolution date:</dt>
         <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.TargetResolutionDate)</dd>
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.ActualResolutionDate):</dt>
+        <dt class="col-sm-2">Actual resolution date:</dt>
         <dd class="col-sm-9">
             @if (Model.issue.ActualResolutionDate.CompareTo(DateTime.MinValue) != 0)
             {
@@ -60,20 +60,20 @@
                 <span>Not yet resolved</span>
             }
         </dd>
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.issue.CreatedOn):</dt>
+        <dt class="col-sm-2">Created on:</dt>
         <dd class="col-sm-9">@Html.DisplayFor(model => model.issue.CreatedOn)</dd>
     </dl>
     <hr />
     <div>
-    <h6 class="fw-bold">@Html.DisplayNameFor(model => model.issue.Description):</h6>
+    <h6 class="fw-bold">Description:</h6>
     <p>@Html.DisplayFor(model => model.issue.Description)</p>
     </div>
     
 </div>
-
+<hr/>
 @if (Model.issue.AsigneeId == getUserId() || Model.issue.CreatorId == getUserId() || getUserId() == 1)
 {
-    <p><a asp-action="Edit" asp-route-id="@Model.issue.Id">Edit</a></p>
+    <p><a class="text-decoration-none" asp-action="Edit" asp-route-id="@Model.issue.Id"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a></p>
     
 }
-<p><a asp-action="Index">Back to List</a></p>
+<p><a class="text-decoration-none" asp-action="Index"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back to List</a></p>

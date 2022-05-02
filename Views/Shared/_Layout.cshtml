@@ -10,16 +10,30 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/IssueTracker.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .is-active {
+            background-color: #a6a6a6;
+            color: white!important;
+        }
+        .is-active:hover {
+            background-color: #a6a6a6;
+            color: black !important;
+        }
+        .btn-primary {
+            background-color: #1c9954!important;
+            border-color: #1c9954!important;
+        }
+    </style>
 </head>
 <body>
     
     <div class="d-flex" style="min-height:90vh">
         <div class="border-end bg-white">
             <div class="sidebar-heading border-bottom">
-                <a asp-area="" asp-controller="Dashboard" asp-action="Index"><img class="p-2" style="width:120px" alt=logo src=~/img/logo.png></a>
+                <a asp-area="" asp-controller="Dashboard" asp-action="Index"><img class="p-2" style="width:120px" alt=logo src=~/img/logo_vector.png></a>
             </div>
-            <div class="list-group list-group-flush">
+            <div class="list-group list-group-flush menu-item">
                 <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                 <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Persons" asp-action="Profile">Profile</a>
                 <a class="list-group-item list-group-item-action text-dark" asp-area="" asp-controller="Projects" asp-action="Index">Projects</a>
@@ -33,7 +47,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                             @if (@httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") != null) {
-                                <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Logout">Logout</a></li>
+                                <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Logout"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a></li>
                             } else
                             {
                                 <li class="nav-item active"><a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Index">Login</a></li>
@@ -55,13 +69,24 @@
             &copy; 2022 - IssueTracker
         </div>
     </footer>
-    
-        
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
+    <script>
+        (function () {
+            let current = location.pathname.split('/')[1];
+            if (current === "") return;
+            let menuItems = document.querySelectorAll('.menu-item a');
+            for (let i = 0, len = menuItems.length; i < len; i++) {
+                if (menuItems[i].getAttribute("href").indexOf(current) !== -1) {
+                    menuItems[i].className += " is-active";
+                }
+            }
+        })();
+    </script>    
+    
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("Notyf")
 </body>

@@ -1,11 +1,11 @@
 ﻿@model IssueTracker.Models.Issue
 
-<h1>Create</h1>
+<h1 style="color: #1c9954!important">Create</h1>
 
 <h4>Issue</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4 m-auto">
+    <div class="col-md-6 m-auto">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group m-1">
@@ -22,14 +22,14 @@
                 <select asp-for="ProjectId" class ="form-control" asp-items="ViewBag.ProjectId"></select>
             </div>
             <div class="form-group m-1">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group m-1">
-                <label asp-for="TargetResolutionDate" class="control-label"></label>
+                <label asp-for="TargetResolutionDate" class="control-label">Target resolution date</label>
                 <input asp-for="TargetResolutionDate" class="form-control" />
                 <span asp-validation-for="TargetResolutionDate" class="text-danger"></span>
+            </div>
+            <div class="form-group m-1">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" style="height: 20vh" ></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group m-1">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -39,7 +39,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to Issues</a>
+    <a class="text-decoration-none" asp-action="Index"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back to Issues</a>
 </div>
 
 @section Scripts {

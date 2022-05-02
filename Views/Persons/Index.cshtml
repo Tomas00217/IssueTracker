@@ -5,17 +5,17 @@
 }
 
 <div>
-    <a class="h1 text-decoration-none" asp-action="Index">@ViewData["Title"]</a>
+    <a class="h1 text-decoration-none" asp-action="Index" style="color: #1c9954!important">@ViewData["Title"]</a>
     <hr/>
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+            First name
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.FirstName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SecondName)
+            Second name
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.SecondName)
@@ -29,7 +29,7 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.PersonId">Edit profile</a>
+    <a class="text-decoration-none" asp-action="Edit" asp-route-id="@Model?.PersonId"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
 </div>
 
 @section Scripts {

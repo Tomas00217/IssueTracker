@@ -25,7 +25,7 @@
     }
 }
 
-<h1>Details</h1>
+<h1 style="color: #1c9954!important">Details</h1>
 
 <div>
     <h4>@Html.DisplayFor(model => model.Project.Name)</h4>
@@ -64,11 +64,11 @@
         </dd>
         <dt class = "col-sm-3">Number of issues:</dt>
         <dd class = "col-sm-9">@getIssueCount(@Model.Project.ProjectId)</dd>
-        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.StartDate):</dt>
+        <dt class = "col-sm-3">Start date:</dt>
         <dd class = "col-sm-9">@Html.DisplayFor(model => model.Project.StartDate)</dd>
-        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.TargetEndDate):</dt>
+        <dt class = "col-sm-3">Target end date:</dt>
         <dd class = "col-sm-9">@Html.DisplayFor(model => model.Project.TargetEndDate)</dd>
-        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.ActualEndDate):</dt>
+        <dt class = "col-sm-3">Actual end date:</dt>
         <dd class = "col-sm-9">
             @if (Model.Project.ActualEndDate.CompareTo(DateTime.MinValue) == 0)
             {
@@ -79,10 +79,11 @@
                 @Html.DisplayFor(model => model.Project.ActualEndDate)
             }
         </dd>
-        <dt class = "col-sm-3">@Html.DisplayNameFor(model => model.Project.CreatedOn):</dt>
+        <dt class = "col-sm-3">Created On:</dt>
         <dd class = "col-sm-9">@Html.DisplayFor(model => model.Project.CreatedOn)</dd>
     </dl>
 </div>
+<hr/>
 <div class="float-end">
     <a class="btn btn-primary" asp-action="UserList" asp-route-projectId="@Model.Project.ProjectId">
         Show Users
@@ -95,7 +96,7 @@
 <partial name="_AddToProjectModal"/>
 @if (Model.userRole == ProjectRole.Manager || getUserId() == 1)
 {
-    <p><a asp-action="Edit" asp-route-id="@Model.Project.ProjectId">Edit</a></p>
+    <p><a class="text-decoration-none" asp-action="Edit" asp-route-id="@Model.Project.ProjectId"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a></p>
 }
 
-<p><a asp-action="Index">Back to List</a></p>
+<p><a class="text-decoration-none" asp-action="Index"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back to List</a></p>

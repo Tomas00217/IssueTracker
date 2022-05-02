@@ -12,7 +12,7 @@
         <form asp-action="AssignPerson">
             <div class="form-group text-start">
                 <label class="control-label">Pick User</label>
-                <input name="email" class="form-control" list="datalistOptions" placeholder="Type to search...">
+                <input name="email" class="form-control" list="datalistOptions" placeholder="Type to search..." autocomplete="off">
                 <input name="id" value="@Model.issue.Id" hidden>
                 <datalist id="datalistOptions">
                     @foreach (var person in Model.personProjects)
