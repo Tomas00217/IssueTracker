@@ -131,6 +131,7 @@ namespace IssueTracker.Controllers
             issue.Creator = _context?.Persons?.FirstOrDefault(p => p.PersonId == issue.CreatorId);
 
             var personProjects = _context?.PersonProjects?.Where(proj => proj.ProjectId == issue.ProjectId).ToList();
+            var comments = _context?.Comments?.Where(c => c.IssueId == issue.Id).OrderByDescending(c => c.EditedOn).ToList();
 
             foreach (var pp in personProjects)
             {
@@ -142,68 +143,12 @@ namespace IssueTracker.Controllers
             issueDetails.issue = issue;
             issueDetails.personProjects = personProjects;
             issueDetails.currentUser = _context?.Persons?.FirstOrDefault(p => p.PersonId == userId);
+            issueDetails.comments = comments;
 
             return View(issueDetails);
         }
 
-        public IActionResult AssignPerson(string email, int id)
-        {
-            if (IsNotLogged())
-            {
-                return RedirectToAction("Index", "Authorization");
-            }
 
-            var issue = _context?.Issues?.FirstOrDefault(i => i.Id == id);
-            
-
-            if (issue == null)
-            {
-                _notyf.Error("Issue not found");
-                return RedirectToAction(nameof(Index));
-            }
-            
-            var person = _context?.Persons?.FirstOrDefault(p => p.Email == email);
-            var personProjects = _context?.PersonProjects?.Where(proj => proj.ProjectId == issue.ProjectId).Select(proj => proj.PersonId).ToList();
-            if (person == null || personProjects == null)
-            {
-                _notyf.Error("Person not found");
-                return RedirectToAction("Details", new { id = id });
-            }
-            
-            if (!personProjects.Contains(person.PersonId))
-            {
-                _notyf.Error("Person is not member of this project");
-                return RedirectToAction("Details", new { id = id });
-            }
-
-            issue.AsigneeId = person.PersonId;
-            issue.Asignee = person;
-
-            _context?.SaveChanges();
-            _notyf.Success("Person assigned");
-            
-            return RedirectToAction("Details", new { id = id });
-        }
-
-        public IActionResult MarkAs(int id, IssueStatus state)
-        {
-            if (IsNotLogged())
-            {
-                return RedirectToAction("Index", "Authorization");
-            }
-
-            var issue = _context?.Issues?.FirstOrDefault(i => i.Id == id);
-            if (state == IssueStatus.Resolved)
-            {
-                issue.ActualResolutionDate = DateTime.Now;
-            }
-            issue.State = state;
-
-            _context.SaveChanges();
-            _notyf.Success("Issue state updated");
-
-            return RedirectToAction("Details", new { id = id });
-        }
 
         // GET: Issue/Edit
         public async Task<IActionResult> Edit(int? id)
@@ -317,7 +262,161 @@ namespace IssueTracker.Controllers
             
             return myStates;
         }
+        
+        public IActionResult AssignPerson(string email, int id)
+        {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
 
+            var issue = _context?.Issues?.FirstOrDefault(i => i.Id == id);
+
+
+            if (issue == null)
+            {
+                _notyf.Error("Issue not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var person = _context?.Persons?.FirstOrDefault(p => p.Email == email);
+            var personProjects = _context?.PersonProjects?.Where(proj => proj.ProjectId == issue.ProjectId).Select(proj => proj.PersonId).ToList();
+            if (person == null || personProjects == null)
+            {
+                _notyf.Error("Person not found");
+                return RedirectToAction("Details", new { id = id });
+            }
+
+            if (!personProjects.Contains(person.PersonId))
+            {
+                _notyf.Error("Person is not member of this project");
+                return RedirectToAction("Details", new { id = id });
+            }
+
+            issue.AsigneeId = person.PersonId;
+            issue.Asignee = person;
+
+            _context?.SaveChanges();
+            _notyf.Success("Person assigned");
+
+            return RedirectToAction("Details", new { id = id });
+        }
+
+        public IActionResult MarkAs(int id, IssueStatus state)
+        {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+
+            var issue = _context?.Issues?.FirstOrDefault(i => i.Id == id);
+            if (state == IssueStatus.Resolved)
+            {
+                issue.ActualResolutionDate = DateTime.Now;
+            }
+            issue.State = state;
+
+            _context.SaveChanges();
+            _notyf.Success("Issue state updated");
+
+            return RedirectToAction("Details", new { id = id });
+        }
+
+        public IActionResult AddComment(int id, string comment)
+        {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+
+            var issue = _context?.Issues?.FirstOrDefault(i => i.Id == id);
+            if (issue == null)
+            {
+                _notyf.Error("Issue not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var userId = GetUserId();
+
+            var commentToAdd = new Comment
+            {
+                IssueId = id,
+                Description = comment,
+                PersonId = userId,
+                EditedOn = DateTime.Now
+            };
+
+            _context.Comments.Add(commentToAdd);
+            _context.SaveChanges();
+
+            _notyf.Success("Comment added");
+
+            return RedirectToAction("Details", new { id = id });
+        }
+
+        public async Task<IActionResult> EditComment(int id, string description)
+        {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+
+            var comment = _context?.Comments?.Find(id);
+            if (comment == null)
+            {
+                _notyf.Error("Comment not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            comment.Description = description;
+            comment.EditedOn = DateTime.Now;
+            try
+            {
+                await _context.SaveChangesAsync();
+                _notyf.Success("Comment sucessfuly edited");
+                return RedirectToAction("Details", new { id = comment.IssueId });
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.");
+            }
+
+            _notyf.Error("Comment is unable to be edited");
+            return RedirectToAction("Details", new { id = comment.IssueId });
+        }
+        public IActionResult DeleteComment(int id)
+        {
+            if (IsNotLogged())
+            {
+                return RedirectToAction("Index", "Authorization");
+            }
+
+            var comment = _context?.Comments?.Find(id);
+            if (comment == null)
+            {
+                _notyf.Error("Comment not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var issue = _context?.Issues?.FirstOrDefault(i => i.Id == comment.IssueId);
+
+            var userId = GetUserId();
+
+            if (userId != issue.AsigneeId && userId != issue.CreatorId)
+            {
+                _notyf.Error("You cannot delete comment from this issue");
+                return RedirectToAction("Details", new { id = comment.IssueId });
+            }
+
+            _context.Comments.Remove(comment);
+            _context.SaveChanges();
+
+            _notyf.Success("Comment deleted");
+
+            return RedirectToAction("Details", new { id = comment.IssueId });
+        }
         private int GetUserId()
         {
             return HttpContext.Session.GetInt32("UserId") ?? -1;

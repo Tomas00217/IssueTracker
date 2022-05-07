@@ -1,0 +1,27 @@
+﻿<!-- Modal -->
+<div class="modal fade" id="editComment" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editComment">Edit comment</h5>
+        <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="EditComment">
+            <div class="form-group text-start comment">
+                <textarea name="description" id="commentText" class="text-break form-control" style="height: 20vh"></textarea>
+                <input name="id" id="commentId" hidden>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary" value="Edit" />
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

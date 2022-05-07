@@ -11,6 +11,11 @@
 
 <h1 style="color: #1c9954!important">Details</h1>
 <h4>@Html.DisplayFor(model => model.issue.Summary)</h4>
+@if (Model.issue.AsigneeId == getUserId() || Model.issue.CreatorId == getUserId() || getUserId() == 1)
+{
+    <p><a class="text-decoration-none" asp-action="Edit" asp-route-id="@Model.issue.Id"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a></p>
+    
+}
 <hr />
 <div>
     <dl class="row">
@@ -66,14 +71,12 @@
     <hr />
     <div>
     <h6 class="fw-bold">Description:</h6>
-    <p>@Html.DisplayFor(model => model.issue.Description)</p>
+    <p style="white-space: pre-wrap">@Html.DisplayFor(model => model.issue.Description)</p>
     </div>
-    
+
+    <hr />
+    <partial name="_Comments" model="@Model.comments"></partial>
+    <partial name="_AddCommentModal"></partial>
 </div>
 <hr/>
-@if (Model.issue.AsigneeId == getUserId() || Model.issue.CreatorId == getUserId() || getUserId() == 1)
-{
-    <p><a class="text-decoration-none" asp-action="Edit" asp-route-id="@Model.issue.Id"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a></p>
-    
-}
 <p><a class="text-decoration-none" asp-action="Index"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back to List</a></p>

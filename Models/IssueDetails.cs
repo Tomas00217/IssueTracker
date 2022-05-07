@@ -10,5 +10,7 @@ namespace IssueTracker.Models
         public List<PersonProject>? personProjects;
 
         public Person? currentUser;
+
+        public List<Comment>? comments;
     }
 }

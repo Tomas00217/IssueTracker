@@ -1,0 +1,28 @@
+﻿<!-- Modal -->
+<div class="modal fade" id="addComment" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addComment">Add new comment</h5>
+        <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="AddComment">
+            <div class="form-group text-start">
+                <label class="control-label">Your comment</label>
+                <input name="id" value="@Model.issue.Id" hidden>
+                <textarea name="comment" class="form-control" style="height: 20vh"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="form-group">
+                    <input type="submit" value="Add" class="btn btn-primary"/>
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

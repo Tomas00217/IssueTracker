@@ -1,0 +1,75 @@
+﻿@model List<IssueTracker.Models.Comment>;
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor httpContextAccessor;
+
+@functions {
+
+    public int getUserId()
+    {
+        return @httpContextAccessor?.HttpContext?.Session.GetInt32("UserId") ?? -1;
+    }
+}
+
+<div>
+    <div class="row">
+        <div class="col-sm-10 m-auto">
+            <h6 class="fw-bold m-0">Comments:</h6>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-link text-decoration-none float-end" data-bs-toggle="modal" data-bs-target="#addComment">Add</button>
+        </div>
+        
+    </div>
+    
+    @foreach (var comment in Model)
+    {
+    <div class="card my-2">
+        <div class="card-header">
+            <span style="color: #002049!important">
+                @Html.DisplayFor(modelItem => comment.Person.FirstName)
+                @Html.DisplayFor(modelItem => comment.Person.SecondName) 
+            </span>
+                   
+            <span class="float-end">@Html.DisplayFor(modelItem => comment.EditedOn)</span>
+        </div>
+        <div class="card-body">
+            <p class="card-text" style="white-space: pre-wrap">@Html.DisplayFor(modelItem => comment.Description)</p>
+            @if (comment.PersonId == getUserId())
+            {
+                <button class="btn btn-danger float-end m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-commentId="@comment.Id" >Delete</button>
+                <button class="btn btn-primary float-end m-1" data-bs-toggle="modal" data-bs-target="#editComment" data-bs-commentId="@comment.Id" data-bs-commentText="@comment.Description">Edit</button>
+            }
+        </div>
+    </div>
+    }
+</div>
+
+<partial name="_DeleteCommentModal">
+<partial name="_EditCommentModal">
+
+<script>
+    var exampleModal = document.getElementById('delete')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget
+
+    var id = button.getAttribute('data-bs-commentId')
+
+    var modalBodyInput = exampleModal.querySelector('.comment input')
+    
+    modalBodyInput.value = id
+    })
+
+    var editCommentModal = document.getElementById('editComment')
+    editCommentModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget
+
+    var id = button.getAttribute('data-bs-commentId')
+    var text = button.getAttribute('data-bs-commentText')
+
+    var editCommentBodyInput = editCommentModal.querySelector('.comment input')
+    var editCommentBodyTextArea = editCommentModal.querySelector('.comment textarea')
+    
+    editCommentBodyInput.value = id
+    editCommentBodyTextArea.value = text
+    })
+</script>

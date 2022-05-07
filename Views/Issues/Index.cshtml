@@ -159,14 +159,14 @@
                 @item.Creator.Email
             </td>
             <td class="text-end">
-                <a class="btn-primary btn m-1" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                <a class="btn-primary btn" asp-action="Details" asp-route-id="@item.Id">Details</a>
                 @if (canDelete(item.CreatorId, item.AsigneeId))
                 {
-                    <button type="button" class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-issueName="@item.Summary" data-bs-issueId="@item.Id">Delete</button>
+                    <button type="button" class="btn btn-danger ml-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-issueName="@item.Summary" data-bs-issueId="@item.Id">Delete</button>
                 }
                 else
                 {
-                    <span type="button" class="btn btn-danger m-1 opacity-50 disabled">Delete</span>
+                    <span type="button" class="btn btn-danger ml-1 opacity-50 disabled">Delete</span>
                 }
                 <partial name="_DeleteIssueModal"></partial>
             </td>
@@ -180,7 +180,6 @@
     <a class="btn-primary btn m-1" asp-action="Create">
         Create New Issue
     </a>
-
     <div class="float-end">
         <a class ="btn-primary btn m-1 @prevDisabled" asp-action="Index" asp-route-PageNumber="@(Model.PageIndex - 1)">
             Previous

@@ -147,9 +147,9 @@
             <td class="text-end">
                 <a type="button" class="btn btn-primary" asp-action="Details" asp-route-id="@item.ProjectId" asp-route-userId="@getUserId()">Details</a>
                 @if (canDelete(item.ProjectId)) {
-                    <button type="button" class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
+                    <button type="button" class="btn btn-danger ml-1" data-bs-toggle="modal" data-bs-target="#delete" data-bs-projName="@item.Name" data-bs-projId="@item.ProjectId">Delete</button>
                 } else {
-                    <span type="button" class="btn btn-danger m-1 opacity-50 disabled">Delete</span>
+                    <span type="button" class="btn btn-danger ml-1 opacity-50 disabled">Delete</span>
                 }
                 <partial name="_DeleteProjectModal"></partial>
             </td>
