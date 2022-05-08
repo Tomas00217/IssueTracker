@@ -89,12 +89,11 @@ namespace IssueTracker.Controllers
             }
 
             
-            return RedirectToAction("Index", "Dashboard");
+            return RedirectToAction("Index", "Projects");
         }
 
         public IActionResult Logout()
         {
-            Console.WriteLine(ToSHA512("adminko123"));
             HttpContext.Session?.Clear();
             _notyf.Success("Logged out sucessfully.");
             return View("Index");
