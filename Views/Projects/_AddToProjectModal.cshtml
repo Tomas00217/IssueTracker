@@ -11,7 +11,7 @@
       <div class="modal-body">
         <form asp-action="InviteDeveloper">
             <div class="form-group text-start">
-                <label class="control-label">Pick User</label>
+                <label class="control-label">Pick developer</label>
                 <input name="email" class="form-control" list="datalistInviteUser" placeholder="Type to search..." autocomplete="off">
                 <input name="projectId" value="@Model.Project.ProjectId" hidden>
                 <datalist id="datalistInviteUser">
@@ -24,7 +24,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <div class="form-group">
-                    <input type="submit" value="Invite User" class="btn btn-primary" />
+                    <input type="submit" value="Invite developer" class="btn btn-primary" />
                 </div>
             </div>
         </form>

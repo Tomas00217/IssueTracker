@@ -28,53 +28,82 @@ namespace IssueTracker.Controllers
 
             if (id == null)
             {
+                _notyf.Error("You need to be logged in to view your profile.");
                 return RedirectToAction("Index", "Authorization");
             }
 
             var person = _context.Persons
-                .FirstOrDefault(m => m.PersonId == id);
+                .FirstOrDefault(p => p.PersonId == id);
+            
             if (person == null)
             {
+                _notyf.Error("Person not found.");
                 return RedirectToAction("Index", "Authorization");
             }
 
             return View("Index", person);
         }
 
+        // GET: Persons/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
+                _notyf.Error("You need to be logged in to edit your profile.");
                 return RedirectToAction("Index", "Authorization");
             }
 
-            var person = await _context.Persons.FindAsync(id);
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (id != userId)
+            {
+                _notyf.Error("Access denied.");
+                return RedirectToAction("Profile");
+            }
+
+            var person = await _context.Persons
+                .FindAsync(id);
+            
             if (person == null)
             {
+                _notyf.Error("Person not found.");
                 return RedirectToAction("Index", "Authorization");
             }
+            
             return View(person);
         }
 
+        // POST: Persons/Edit
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPost(int? id)
         {
             if (id == null)
             {
+                _notyf.Error("You need to be logged in to edit your profile.");
                 return RedirectToAction("Index", "Authorization");
             }
-            var personToUpdate = await _context.Persons.FirstOrDefaultAsync(p => p.PersonId == id);
 
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (id != userId)
+            {
+                _notyf.Error("Access denied.");
+                return RedirectToAction("Profile");
+            }
+
+            var personToUpdate = await _context.Persons
+                .FirstOrDefaultAsync(p => p.PersonId == id);
+
+            // Update only the changed fields
             if (await TryUpdateModelAsync<Person>(
                 personToUpdate,
                 "",
                 p => p.FirstName, p => p.SecondName))
             {
-
                 try
                 {
                     await _context.SaveChangesAsync();
+                    
+                    _notyf.Success("Profile updated successfully");
                     return RedirectToAction(nameof(Profile));
                 }
                 catch (DbUpdateException)
@@ -85,6 +114,7 @@ namespace IssueTracker.Controllers
                 }
             }
 
+            _notyf.Error("Updating profile failed");
             return View(personToUpdate);
         }
         
@@ -93,7 +123,9 @@ namespace IssueTracker.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            var user = _context.Persons.Find(id);
+            var user = _context.Persons
+                .Find(id);
+            
             _context.Persons.Remove(user);
             _context.SaveChanges();
 

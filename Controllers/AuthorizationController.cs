@@ -20,6 +20,7 @@ namespace IssueTracker.Controllers
             _notyf = notyf;
         }
 
+        // Hashes the password and returns the hashed password
         public string ToSHA512(string input)
         {
             using (SHA512 sha512Hash = SHA512.Create())
@@ -63,7 +64,7 @@ namespace IssueTracker.Controllers
             _context.Persons.Add(person); 
             await _context.SaveChangesAsync();
 
-            _notyf.Success("Registration sucessful.");
+            _notyf.Success("Registration successful.");
             return View("Index");
         }
 
@@ -80,7 +81,7 @@ namespace IssueTracker.Controllers
 
             if (ToSHA512(person.Password).Equals(user.Password))
             {
-                _notyf.Success("Logged in sucessfully.");
+                _notyf.Success("Logged in successfully.");
                 HttpContext.Session.SetInt32("UserId", user.PersonId);
             } else
             {
@@ -88,14 +89,15 @@ namespace IssueTracker.Controllers
                 return View("Index");
             }
 
-            
+            // Redirects user to the project index page showing him his projects
             return RedirectToAction("Index", "Projects");
         }
 
         public IActionResult Logout()
         {
             HttpContext.Session?.Clear();
-            _notyf.Success("Logged out sucessfully.");
+            
+            _notyf.Success("Logged out successfully.");
             return View("Index");
         }
 

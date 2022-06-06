@@ -7,7 +7,10 @@
 <div>
     <a class="h1 text-decoration-none" asp-action="Index" style="color: #1c9954!important">@ViewData["Title"]</a>
     <div>
-    <a class="text-decoration-none" asp-action="Edit" asp-route-id="@Model?.PersonId"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+        <a class="text-decoration-none" asp-action="Edit" asp-route-id="@Model?.PersonId">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> 
+            Edit
+        </a>
     </div>
     <hr/>
     <dl class="row">
@@ -23,15 +26,14 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.SecondName)
         </dd>
-                <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
+        <dt class = "col-sm-2">
+            Email
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Email)
         </dd>
     </dl>
 </div>
-
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

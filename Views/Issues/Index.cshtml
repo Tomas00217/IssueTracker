@@ -18,7 +18,7 @@
     public Boolean canDelete(int creatorId, int assigneeId)
     {
         int userId = getUserId();
-        return userId == 1 || userId == creatorId || userId == assigneeId;
+        return userId == 1 || userId == creatorId;
     }
 }
 

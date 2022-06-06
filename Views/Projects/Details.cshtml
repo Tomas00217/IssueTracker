@@ -38,7 +38,10 @@
         <dt class = "col-sm-3">People working on this project:</dt>
         <dd class = "col-sm-7">@getPeopleCount(@Model.Project.ProjectId)</dd>
         <dd class = "col-sm-2">
-            <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
+            @if (Model.userRole != ProjectRole.Developer || getUserId() == 1)
+            {
+                <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#inviteUser">Invite to project</button>
+            }
         </dd>
         <dt class = "col-sm-3">Project Lead:</dt>
         <dd class = "col-sm-7">
@@ -54,14 +57,14 @@
             @if (@Model.userRole == ProjectRole.Manager && Model.projectLead == null)
             {
                 <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#projectLead">
-                    Set Project Lead
+                    Set project lead
                 </button>
                 <partial name="_SetProjectLeadModal"/>
             }
             else if (@Model.userRole == ProjectRole.Manager && Model.projectLead != null)
             {
                 <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#projectLead">
-                    Change Project Lead
+                    Change project lead
                 </button>
                 <partial name="_SetProjectLeadModal" />
             }

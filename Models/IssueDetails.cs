@@ -12,5 +12,7 @@ namespace IssueTracker.Models
         public Person? currentUser;
 
         public List<Comment>? comments;
+
+        public ProjectRole userRole;
     }
 }

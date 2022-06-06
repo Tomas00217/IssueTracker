@@ -57,7 +57,7 @@ namespace IssueTracker.Controllers
             var currUserPP = _context.PersonProjects.Where(pp => pp.PersonId == userId && pp.Role == ProjectRole.Manager).Select(pp => pp.ProjectId).ToList();
             ViewData["CurrUserPP"] = currUserPP;
 
-            return View(await PaginatedList<Project>.CreateAsync(projects, pageNumber, 8));
+            return View(PaginatedList<Project>.Create(projects, pageNumber, 8));
         }
 
         // GET: Projects/Details
@@ -79,10 +79,10 @@ namespace IssueTracker.Controllers
             projectDetails.projectIds = _context.PersonProjects.Select(proj => proj.ProjectId);
             projectDetails.projectLead = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.Role == ProjectRole.ProjectLead).Select(p => p.Person.Email).SingleOrDefault();
             var issues = _context.Issues.Where(i => i.ProjectId == id);
-            projectDetails.issues = await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 5);
+            projectDetails.issues = PaginatedList<Issue>.Create(issues, pageNumber, 5);
             projectDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == id && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
             var personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == id);
-            projectDetails.personProjects = await PaginatedList<PersonProject>.CreateAsync(personProjects, pageNumber, 10);
+            projectDetails.personProjects = PaginatedList<PersonProject>.Create(personProjects, pageNumber, 10);
             projectDetails.allUsers = _context.Persons.ToList();
 
             return View(projectDetails);
@@ -122,7 +122,7 @@ namespace IssueTracker.Controllers
             _context.PersonProjects.Add(personProject);
             _context.SaveChanges();
 
-            _notyf.Success("User sucessfuly added");
+            _notyf.Success("User successfuly added");
             return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
         }
 
@@ -158,7 +158,7 @@ namespace IssueTracker.Controllers
             personProject.Role = ProjectRole.ProjectLead;
             _context.SaveChanges();
 
-            _notyf.Success("Project lead sucessfuly set");
+            _notyf.Success("Project lead successfuly set");
             return RedirectToAction("Details", new { id = projectId, userId = currentUserId });
         }
 
@@ -189,7 +189,7 @@ namespace IssueTracker.Controllers
             _context.PersonProjects.Remove(personProject);
             _context.SaveChanges();
 
-            _notyf.Success("User sucessfuly removed from project");
+            _notyf.Success("User successfuly removed from project");
             return RedirectToAction("UserList", new { projectId = personProject.ProjectId});
         }
 
@@ -210,7 +210,7 @@ namespace IssueTracker.Controllers
 
             projectDetails.Project = project;
             var personProjects = _context.PersonProjects.Where(proj => proj.ProjectId == projectId);
-            projectDetails.personProjects = await PaginatedList<PersonProject>.CreateAsync(personProjects, pageNumber, 10);
+            projectDetails.personProjects = PaginatedList<PersonProject>.Create(personProjects, pageNumber, 10);
             projectDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == projectId && proj.PersonId == userId).Select(pers => pers.Role).SingleOrDefault();
 
             foreach (var pp in projectDetails.personProjects)
@@ -258,7 +258,7 @@ namespace IssueTracker.Controllers
             _context.PersonProjects.Add(personProject);
             _context.SaveChanges();
 
-            _notyf.Success("Project sucessfuly created");
+            _notyf.Success("Project successfuly created");
             return RedirectToAction("Index");
         }
 
@@ -321,7 +321,7 @@ namespace IssueTracker.Controllers
                 try
                 {
                     await _context.SaveChangesAsync();
-                    _notyf.Success("Project sucessfuly edited");
+                    _notyf.Success("Project successfuly edited");
                     return RedirectToAction("Details", new { id = id, userId = HttpContext.Session.GetInt32("UserId") ?? -1 });
                 }
                 catch (DbUpdateException )
@@ -343,7 +343,7 @@ namespace IssueTracker.Controllers
             _context.Projects.Remove(project);
             _context.SaveChanges();
 
-            _notyf.Success("Project sucessfuly deleted");
+            _notyf.Success("Project successfuly deleted");
             return RedirectToAction(nameof(Index));
         }
 

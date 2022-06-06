@@ -68,7 +68,7 @@ namespace IssueTracker.Controllers
 
             issues = Utils.Issues.IssueSorts.sortByType(issues, sortType, state, priority, userId);
 
-            return View(await PaginatedList<Issue>.CreateAsync(issues, pageNumber, 8));
+            return View(PaginatedList<Issue>.Create(issues, pageNumber, 8));
         }
 
         // GET
@@ -144,7 +144,10 @@ namespace IssueTracker.Controllers
             issueDetails.personProjects = personProjects;
             issueDetails.currentUser = _context?.Persons?.FirstOrDefault(p => p.PersonId == userId);
             issueDetails.comments = comments;
-
+            issueDetails.userRole = _context.PersonProjects.Where(proj => proj.ProjectId == issue.ProjectId && proj.PersonId == userId)
+                .Select(pers => pers.Role)
+                .SingleOrDefault();
+            
             return View(issueDetails);
         }
 
@@ -212,7 +215,7 @@ namespace IssueTracker.Controllers
                 try
                 {
                     await _context.SaveChangesAsync();
-                    _notyf.Success("Issue sucessfuly edited");
+                    _notyf.Success("Issue successfuly edited");
                     return RedirectToAction("Details", new {id = issue.Id});
                 }
                 catch (DbUpdateException)
@@ -234,7 +237,7 @@ namespace IssueTracker.Controllers
             _context.Issues.Remove(issue);
             _context.SaveChanges();
 
-            _notyf.Success("Issue sucessfuly deleted");
+            _notyf.Success("Issue successfuly deleted");
             return RedirectToAction(nameof(Index));
         }
 
@@ -244,19 +247,19 @@ namespace IssueTracker.Controllers
             
             if (type == "priority")
             {
-                foreach (IssuePriority lang in Enum.GetValues(typeof(IssuePriority)))
+                foreach (IssuePriority priority in Enum.GetValues(typeof(IssuePriority)))
                     myStates.Add(new ConvertEnum
                     {
-                        Value = (int)lang,
-                        Text = lang.ToString()
+                        Value = (int) priority,
+                        Text = priority.ToString()
                     });
             } else
             {
-                foreach (IssueStatus lang in Enum.GetValues(typeof(IssueStatus)))
+                foreach (IssueStatus status in Enum.GetValues(typeof(IssueStatus)))
                     myStates.Add(new ConvertEnum
                     {
-                        Value = (int)lang,
-                        Text = lang.ToString()
+                        Value = (int) status,
+                        Text = status.ToString()
                     });
             }
             
@@ -350,7 +353,6 @@ namespace IssueTracker.Controllers
             _context.SaveChanges();
 
             _notyf.Success("Comment added");
-
             return RedirectToAction("Details", new { id = id });
         }
 
@@ -373,7 +375,7 @@ namespace IssueTracker.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                _notyf.Success("Comment sucessfuly edited");
+                _notyf.Success("Comment successfuly edited");
                 return RedirectToAction("Details", new { id = comment.IssueId });
             }
             catch (DbUpdateException)
@@ -386,6 +388,7 @@ namespace IssueTracker.Controllers
             _notyf.Error("Comment is unable to be edited");
             return RedirectToAction("Details", new { id = comment.IssueId });
         }
+        
         public IActionResult DeleteComment(int id)
         {
             if (IsNotLogged())
